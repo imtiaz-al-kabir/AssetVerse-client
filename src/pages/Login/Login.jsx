@@ -1,24 +1,18 @@
-import axios from "axios";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router";
+import useAxiosBase from "../../hooks/useAxiosBase";
 
 const Login = () => {
   const navigate = useNavigate();
+  const axiosBase = useAxiosBase();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
   const handleLogin = async (data) => {
-    console.log(data);
-    const { email, password } = data;
-    const userinfo = {
-      email,
-      password,
-    };
-
     try {
-      axios.post("/api/users/login", userinfo).then((res) => {
+      axiosBase.post("/users/login", data).then((res) => {
         if (res.ok) {
           localStorage.setItem("userInfo", JSON.stringify(data));
           navigate("/dashboard");
