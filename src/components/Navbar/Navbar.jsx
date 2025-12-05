@@ -1,17 +1,18 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { HiMenu, HiX } from "react-icons/hi";
+import { Link, NavLink, useNavigate } from "react-router";
 
 const Navbar = () => {
   const [user, setUser] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
-  // Check auth status on mount and when LocalStorage might change
   useEffect(() => {
     const userInfo = localStorage.getItem("userInfo");
     if (userInfo) {
       setUser(JSON.parse(userInfo));
     }
-  }, [navigate]); // Reacting to navigate often catches login/logout
+  }, [navigate]);
 
   const handleLogout = async () => {
     await fetch("/api/users/logout", { method: "POST" });
@@ -20,101 +21,196 @@ const Navbar = () => {
     navigate("/login");
   };
 
+  const activeClass = "text-primary font-bold border-b-2 border-primary pb-1";
+  const normalClass = "hover:text-primary transition";
+
   return (
-    <div className="navbar bg-base-100 shadow-lg sticky top-0 z-50  md:px-10  ">
-      <div className="container mx-auto flex justify-between py-4 ">
-        <div className="">
-          <Link
-            to="/"
-            className="btn btn-ghost normal-case text-2xl text-primary font-bold"
-          >
-            AssetVerse
-          </Link>
-        </div>
-        <div className="flex  gap-5">
+    <nav className="bg-base-100 shadow-md sticky top-0 z-50 px-4 py-3 md:px-10">
+      <div className="container mx-auto flex justify-between items-center">
+        {/* Logo */}
+        <NavLink to="/" className="text-2xl font-bold text-primary">
+          AssetVerse
+        </NavLink>
+
+        {/* Mobile Toggle Button */}
+        <button
+          className="md:hidden text-3xl"
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          {menuOpen ? <HiX /> : <HiMenu />}
+        </button>
+
+        {/* Desktop Menu */}
+        <div className="hidden md:flex items-center gap-6">
           {!user ? (
             <>
-              <Link to="/" className="btn btn-ghost">
+              <NavLink
+                to="/"
+                className={({ isActive }) =>
+                  isActive ? activeClass : normalClass
+                }
+              >
                 Home
-              </Link>
-              <Link to="/register/employee" className="btn btn-ghost">
+              </NavLink>
+
+              <NavLink
+                to="/register/employee"
+                className={({ isActive }) =>
+                  isActive ? activeClass : normalClass
+                }
+              >
                 Join as Employee
-              </Link>
-              <Link to="/register/hr" className="btn btn-primary">
+              </NavLink>
+
+              <NavLink to="/register/hr" className="btn btn-primary">
                 Join as HR Manager
-              </Link>
-              <Link to="/login" className="btn btn-outline btn-primary ml-2">
+              </NavLink>
+
+              <NavLink to="/login" className="btn btn-outline btn-primary ml-2">
                 Login
-              </Link>
+              </NavLink>
             </>
           ) : (
-            <div className="dropdown dropdown-end">
-              <label
-                tabIndex={0}
-                className="btn btn-ghost btn-circle avatar border-primary border-2"
+            <div className="flex items-center gap-3">
+              {/* Avatar */}
+              <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary">
+                <img
+                  src={
+                    user.profileImage ||
+                    "https://ui-avatars.com/api/?name=" +
+                      user.name.replace(" ", "+")
+                  }
+                  alt="avatar"
+                />
+              </div>
+
+              <div className="flex flex-col text-right">
+                <span className="font-bold">{user.name}</span>
+                <small className="text-gray-500">{user.role}</small>
+              </div>
+
+              <NavLink to="/dashboard" className={normalClass}>
+                Dashboard
+              </NavLink>
+
+              <button className="btn btn-sm btn-error" onClick={handleLogout}>
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Mobile Drawer */}
+      {menuOpen && (
+        <div className="md:hidden mt-3 bg-base-100 rounded-lg shadow-inner p-4 ">
+          {!user ? (
+            <div className="space-y-4" >
+              <NavLink
+                to="/"
+                className={({ isActive }) =>
+                  isActive ? activeClass : normalClass
+                }
+                onClick={() => setMenuOpen(false)}
               >
-                <div className="w-10 rounded-full">
+                Home
+              </NavLink>
+              
+              <NavLink
+                to="/register/employee"
+               className="block"
+                onClick={() => setMenuOpen(false)}
+              >
+                Join as Employee
+              </NavLink>
+
+              <NavLink
+                to="/register/hr"
+                className="btn btn-primary w-full"
+                onClick={() => setMenuOpen(false)}
+              >
+                Join as HR Manager
+              </NavLink>
+
+              <NavLink
+                to="/login"
+                className="btn btn-outline btn-primary w-full"
+                onClick={() => setMenuOpen(false)}
+              >
+                Login
+              </NavLink>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-primary">
                   <img
                     src={
                       user.profileImage ||
                       "https://ui-avatars.com/api/?name=" +
                         user.name.replace(" ", "+")
                     }
-                    alt={user.name}
+                    alt="avatar"
                   />
                 </div>
-              </label>
-              <ul
-                tabIndex={0}
-                className="mt-3 z-1 p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52"
+                <div>
+                  <p className="font-bold">{user.name}</p>
+                  <small className="text-gray-500">{user.role}</small>
+                </div>
+              </div>
+
+              <div className="divider"></div>
+
+              <NavLink
+                to="/dashboard"
+                className={normalClass}
+                onClick={() => setMenuOpen(false)}
               >
-                <li>
-                  <span className="font-bold text-center">{user.name}</span>
-                </li>
-                <li>
-                  <small className="text-center lowercase text-gray-500">
-                    {user.role}
-                  </small>
-                </li>
-                <div className="divider my-0"></div>
-                <li>
-                  <Link to="/dashboard">Dashboard</Link>
-                </li>
-                {user.role === "hr" && (
-                  <>
-                    <li>
-                      <Link to="/assets">My Assets</Link>
-                    </li>
-                    <li>
-                      <Link to="/my-employees">My Team</Link>
-                    </li>
-                    <li>
-                      <Link to="/requests">Requests</Link>
-                    </li>
-                  </>
-                )}
-                {user.role === "employee" && (
-                  <>
-                    <li>
-                      <Link to="/my-assets">My Assets</Link>
-                    </li>
-                    <li>
-                      <Link to="/my-team">My Team</Link>
-                    </li>
-                    <li>
-                      <Link to="/request-asset">Request Asset</Link>
-                    </li>
-                  </>
-                )}
-                <li>
-                  <button onClick={handleLogout}>Logout</button>
-                </li>
-              </ul>
+                Dashboard
+              </NavLink>
+
+              {user.role === "hr" && (
+                <>
+                  <NavLink to="/assets" onClick={() => setMenuOpen(false)}>
+                    My Assets
+                  </NavLink>
+                  <NavLink
+                    to="/my-employees"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    My Team
+                  </NavLink>
+                  <NavLink to="/requests" onClick={() => setMenuOpen(false)}>
+                    Requests
+                  </NavLink>
+                </>
+              )}
+
+              {user.role === "employee" && (
+                <>
+                  <NavLink to="/my-assets" onClick={() => setMenuOpen(false)}>
+                    My Assets
+                  </NavLink>
+                  <NavLink to="/my-team" onClick={() => setMenuOpen(false)}>
+                    My Team
+                  </NavLink>
+                  <NavLink
+                    to="/request-asset"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Request Asset
+                  </NavLink>
+                </>
+              )}
+
+              <button className="btn btn-error w-full" onClick={handleLogout}>
+                Logout
+              </button>
             </div>
           )}
         </div>
-      </div>
-    </div>
+      )}
+    </nav>
   );
 };
 
