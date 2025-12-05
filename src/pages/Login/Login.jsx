@@ -1,0 +1,79 @@
+import axios from "axios";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router";
+
+const Login = () => {
+  const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+  const handleLogin = async (data) => {
+    console.log(data);
+    const { email, password } = data;
+    const userinfo = {
+      email,
+      password,
+    };
+
+    try {
+      axios.post("/api/users/login", userinfo).then((res) => {
+        if (res.ok) {
+          localStorage.setItem("userInfo", JSON.stringify(data));
+          navigate("/dashboard");
+        } else {
+          alert(data.message);
+        }
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    <div className="flex justify-center items-center min-h-[80vh]">
+      <div className="card w-96 bg-base-100 shadow-xl">
+        <div className="card-body">
+          <h2 className="card-title justify-center text-2xl mb-4">Login</h2>
+          <form onSubmit={handleSubmit(handleLogin)}>
+            <div className="form-control w-full max-w-xs">
+              <label className="label">
+                <span className="label-text">Email</span>
+              </label>
+              <input
+                type="email"
+                {...register("email", { required: true })}
+                className="input input-bordered w-full max-w-xs focus-within:outline-0"
+              />
+
+              {errors.email && (
+                <p className="text-red-500">{errors.email.message}</p>
+              )}
+            </div>
+            <div className="form-control w-full max-w-xs mt-4">
+              <label className="label">
+                <span className="label-text">Password</span>
+              </label>
+              <input
+                type="password"
+                {...register("password", { required: true })}
+                className="input input-bordered w-full max-w-xs focus-within:outline-0"
+              />
+              {errors.password && (
+                <p className="text-red-500">{errors.password.message}</p>
+              )}
+            </div>
+            <div className="card-actions justify-center mt-6">
+              <button type="submit" className="btn btn-primary w-full">
+                Login
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Login;

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { HiMenu, HiX } from "react-icons/hi";
-import { Link, NavLink, useNavigate } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 
 const Navbar = () => {
   const [user, setUser] = useState(null);
@@ -25,8 +25,8 @@ const Navbar = () => {
   const normalClass = "hover:text-primary transition";
 
   return (
-    <nav className="bg-base-100 shadow-md sticky top-0 z-50 px-4 py-3 md:px-10">
-      <div className="container mx-auto flex justify-between items-center">
+    <nav className="bg-base-100 shadow-md sticky top-0 z-50 px-4 py-4 md:px-10">
+      <div className="container mx-auto flex justify-between items-center ">
         {/* Logo */}
         <NavLink to="/" className="text-2xl font-bold text-primary">
           AssetVerse
@@ -105,7 +105,7 @@ const Navbar = () => {
       {menuOpen && (
         <div className="md:hidden mt-3 bg-base-100 rounded-lg shadow-inner p-4 ">
           {!user ? (
-            <div className="space-y-4" >
+            <div className="space-y-4">
               <NavLink
                 to="/"
                 className={({ isActive }) =>
@@ -115,10 +115,10 @@ const Navbar = () => {
               >
                 Home
               </NavLink>
-              
+
               <NavLink
                 to="/register/employee"
-               className="block"
+                className="block"
                 onClick={() => setMenuOpen(false)}
               >
                 Join as Employee
