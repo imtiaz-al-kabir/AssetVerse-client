@@ -52,7 +52,7 @@ const RegisterHR = () => {
               <input
                 type="text"
                 {...register("name", { required: true })}
-                className="input input-bordered w-full"
+                className="input input-bordered w-full focus-within:outline-0"
               />
 
               {errors.name && (
@@ -66,7 +66,7 @@ const RegisterHR = () => {
               <input
                 type="text"
                 {...register("companyName", { required: true })}
-                className="input input-bordered w-full"
+                className="input input-bordered w-full focus-within:outline-0"
               />
               {errors.companyName && (
                 <p className="text-red-500">{errors.companyName.message}</p>
@@ -80,7 +80,7 @@ const RegisterHR = () => {
                 type="text"
                 name="companyLogo"
                 {...register("companyLogo", { required: true })}
-                className="input input-bordered w-full"
+                className="input input-bordered w-full focus-within:outline-0"
                 placeholder="https://..."
                 required
               />
@@ -95,7 +95,7 @@ const RegisterHR = () => {
               <input
                 type="email"
                 {...register("email", { required: true })}
-                className="input input-bordered w-full"
+                className="input input-bordered w-full focus-within:outline-0"
               />
               {errors.email && (
                 <p className="text-red-500">{errors.email.message}</p>
@@ -119,7 +119,7 @@ const RegisterHR = () => {
                       "Password must include uppercase, lowercase & special character",
                   },
                 })}
-                className="input input-bordered w-full"
+                className="input input-bordered w-full focus-within:outline-0"
               />
 
               {errors.password && (
@@ -133,7 +133,7 @@ const RegisterHR = () => {
               <input
                 type="date"
                 {...register("dateOfBirth")}
-                className="input input-bordered w-full"
+                className="input input-bordered w-full focus-within:outline-0"
               />
             </div>
 

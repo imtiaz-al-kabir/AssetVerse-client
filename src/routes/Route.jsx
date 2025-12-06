@@ -5,6 +5,7 @@ import Register from "../pages/Auth/Register/Register";
 import RegisterEmployee from "../pages/Auth/RegisterEmployee/RegisterEmployee";
 import RegisterHR from "../pages/Auth/RegisterHr/RegisterHR";
 import Home from "../pages/Home/Home/Home";
+import Dashboard from "../pages/Dashboard/Dashboard";
 
 const router = createBrowserRouter([
   {
@@ -28,8 +29,12 @@ const router = createBrowserRouter([
         Component: RegisterEmployee,
       },
       {
-        path: "register/hr",
+        path: "/register/hr",
         Component: RegisterHR,
+      },
+      {
+        path: "/dashboard",
+        Component: Dashboard,
       },
     ],
   },
