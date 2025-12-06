@@ -6,8 +6,9 @@ import RegisterEmployee from "../pages/Auth/RegisterEmployee/RegisterEmployee";
 import RegisterHR from "../pages/Auth/RegisterHr/RegisterHR";
 import Dashboard from "../pages/Dashboard/Dashboard";
 import Home from "../pages/Home/Home/Home";
-import NotFound from "../pages/NotFound/NotFound";
 import MyAssets from "../pages/MyAssets/MyAssets";
+import MyTeam from "../pages/MyTeam/MyTeam";
+import NotFound from "../pages/NotFound/NotFound";
 
 const router = createBrowserRouter([
   {
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
       {
         path: "/my-assets",
         Component: MyAssets,
+      },
+      {
+        path: "/my-team",
+        Component: MyTeam,
       },
     ],
   },
