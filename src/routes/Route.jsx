@@ -9,6 +9,7 @@ import Home from "../pages/Home/Home/Home";
 import MyAssets from "../pages/MyAssets/MyAssets";
 import MyTeam from "../pages/MyTeam/MyTeam";
 import NotFound from "../pages/NotFound/NotFound";
+import RequestAsset from "../pages/RequestAsset/RequestAsset";
 
 const router = createBrowserRouter([
   {
@@ -47,6 +48,10 @@ const router = createBrowserRouter([
       {
         path: "/my-team",
         Component: MyTeam,
+      },
+      {
+        path: "/request-asset",
+        Component: RequestAsset,
       },
     ],
   },
