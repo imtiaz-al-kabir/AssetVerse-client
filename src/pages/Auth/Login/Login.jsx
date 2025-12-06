@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router";
-import useAxiosBase from "../../hooks/useAxiosBase";
+import useAxiosBase from "../../../hooks/useAxiosBase";
+
 
 const Login = () => {
   const navigate = useNavigate();
@@ -12,16 +13,17 @@ const Login = () => {
   } = useForm();
   const handleLogin = async (data) => {
     try {
-      axiosBase.post("/users/login", data).then((res) => {
-        if (res.ok) {
-          localStorage.setItem("userInfo", JSON.stringify(data));
-          navigate("/dashboard");
-        } else {
-          alert(data.message);
-        }
+      const res = await axiosBase.post("/users/login", data, {
+        withCredentials: true, // important to send/receive cookies
       });
+
+      if (res.status === 200) {
+        // Cookie is automatically stored, no need for localStorage
+        navigate("/dashboard");
+      }
     } catch (error) {
       console.error(error);
+      alert(error.response?.data?.message || "Login failed");
     }
   };
 

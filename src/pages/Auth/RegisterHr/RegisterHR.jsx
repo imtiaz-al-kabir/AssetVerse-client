@@ -1,9 +1,10 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
-import useAxiosBase from "../../hooks/useAxiosBase";
+import useAxiosBase from "../../../hooks/useAxiosBase";
 
-const RegisterEmployee = () => {
+const RegisterHR = () => {
   const navigate = useNavigate();
+
   const axiosBase = useAxiosBase();
   const {
     register,
@@ -11,38 +12,39 @@ const RegisterEmployee = () => {
     formState: { errors },
   } = useForm();
 
-  const handleEmployee = (data) => {
+  const handleHR = async (data) => {
     const formData = {
       name: data.name,
       email: data.email,
       password: data.password,
       dateOfBirth: data.dateOfBirth,
-      role: "employee",
+      companyName: data.companyName,
+      companyLogo: data.companyLogo,
+      role: "hr",
     };
-    console.log(formData);
 
     try {
-      axiosBase.post("/users/register", formData).then((res) => {
-        if (res.ok) {
-          localStorage.setItem("userInfo", JSON.stringify(data));
-          navigate("/dashboard"); // Employee Dashboard (will show "No company" initially)
-        } else {
-          alert(data.message);
-        }
+      const res = await axiosBase.post("/users/register", formData, {
+        withCredentials: true, // send cookie
       });
+
+      if (res.status === 201) {
+        // No localStorage needed; cookie handles auth
+        navigate("/dashboard");
+      }
     } catch (error) {
       console.error(error);
+      alert(error.response?.data?.message || "Registration failed");
     }
   };
-
   return (
     <div className="flex justify-center items-center py-10">
       <div className="card w-96 bg-base-100 shadow-xl">
         <div className="card-body">
           <h2 className="card-title justify-center text-2xl mb-4">
-            Join as Employee
+            Join as HR Manager
           </h2>
-          <form onSubmit={handleSubmit(handleEmployee)}>
+          <form onSubmit={handleSubmit(handleHR)}>
             <div className="form-control w-full">
               <label className="label">
                 <span className="label-text">Full Name</span>
@@ -55,6 +57,35 @@ const RegisterEmployee = () => {
 
               {errors.name && (
                 <p className="text-red-500">{errors.name.message}</p>
+              )}
+            </div>
+            <div className="form-control w-full mt-2">
+              <label className="label">
+                <span className="label-text">Company Name</span>
+              </label>
+              <input
+                type="text"
+                {...register("companyName", { required: true })}
+                className="input input-bordered w-full"
+              />
+              {errors.companyName && (
+                <p className="text-red-500">{errors.companyName.message}</p>
+              )}
+            </div>
+            <div className="form-control w-full mt-2">
+              <label className="label">
+                <span className="label-text">Company Logo URL</span>
+              </label>
+              <input
+                type="text"
+                name="companyLogo"
+                {...register("companyLogo", { required: true })}
+                className="input input-bordered w-full"
+                placeholder="https://..."
+                required
+              />
+               {errors.companyLogo && (
+                <p className="text-red-500">{errors.companyLogo.message}</p>
               )}
             </div>
             <div className="form-control w-full mt-2">
@@ -107,8 +138,8 @@ const RegisterEmployee = () => {
             </div>
 
             <div className="card-actions justify-center mt-6">
-              <button type="submit" className="btn btn-secondary w-full">
-                Join AssetVerse
+              <button type="submit" className="btn btn-primary w-full">
+                Register Company
               </button>
             </div>
           </form>
@@ -118,4 +149,4 @@ const RegisterEmployee = () => {
   );
 };
 
-export default RegisterEmployee;
+export default RegisterHR;
