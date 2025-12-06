@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import useAxiosBase from "../../hooks/useAxiosBase";
 
-import RequestList from "../components/RequestList";
 import DashboardCharts from "../../components/DashboardCharts/DashboardCharts";
+import RequestList from "../../components/RequestList/RequestList";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
