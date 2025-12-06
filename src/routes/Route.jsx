@@ -1,4 +1,5 @@
 import { createBrowserRouter } from "react-router";
+import AssetForm from "../components/AssetForm/AssetForm";
 import AssetList from "../components/AssetList/AssetList";
 import RequestList from "../components/RequestList/RequestList";
 import HomeLayout from "../layouts/HomeLayout";
@@ -61,12 +62,20 @@ const router = createBrowserRouter([
         Component: RequestList,
       },
       {
+        path: "/requests/new",
+        Component: RequestList,
+      },
+      {
         path: "/my-employees",
         Component: MyEmployeeList,
       },
       {
         path: "/assets",
         Component: AssetList,
+      },
+      {
+        path: "/assets/add",
+        Component: AssetForm,
       },
     ],
   },
