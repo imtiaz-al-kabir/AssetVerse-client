@@ -1,35 +1,37 @@
-import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
+import useAxiosBase from "../../hooks/useAxiosBase";
 
 const AssetForm = () => {
-  const [formData, setFormData] = useState({
-    productName: "",
-    productType: "Returnable",
-    productQuantity: 1,
-    productImage: "",
-  });
   const navigate = useNavigate();
+  const axiosBase = useAxiosBase();
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const handleAsset = async (data) => {
+    const formData = {
+      productName: data.productName,
+      productType: data.productName,
+      productQuantity: parseInt(data.productQuantity),
+      productImage: data.productImage,
+    };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
     try {
-      const res = await fetch("/api/assets", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+      const res = await axiosBase.post("/assets", formData, {
+        withCredentials: true, // important to send/receive cookies
       });
-      if (res.ok) {
-        navigate("/dashboard"); // Or back to asset list
-      } else {
-        const data = await res.json();
-        alert(data.message);
+
+      if (res.status === 200) {
+        // Cookie is automatically stored, no need for localStorage
+        navigate("/dashboard");
       }
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error(error);
+      alert(error.response?.data?.message || " failed");
     }
   };
 
@@ -38,18 +40,15 @@ const AssetForm = () => {
       <div className="card w-96 bg-base-100 shadow-xl">
         <div className="card-body">
           <h2 className="card-title justify-center mb-4">Add New Asset</h2>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit(handleAsset)}>
             <div className="form-control w-full">
               <label className="label">
                 <span className="label-text">Product Name</span>
               </label>
               <input
                 type="text"
-                name="productName"
-                value={formData.productName}
-                onChange={handleChange}
-                className="input input-bordered w-full"
-                required
+                {...register("productName", { required: true })}
+                className="input input-bordered w-full focus-within:outline-0"
               />
             </div>
 
@@ -59,12 +58,9 @@ const AssetForm = () => {
               </label>
               <input
                 type="text"
-                name="productImage"
-                value={formData.productImage}
-                onChange={handleChange}
-                className="input input-bordered w-full"
+                {...register("productImage", { required: true })}
+                className="input input-bordered w-full focus-within:outline-0"
                 placeholder="https://..."
-                required
               />
             </div>
 
@@ -73,10 +69,8 @@ const AssetForm = () => {
                 <span className="label-text">Product Type</span>
               </label>
               <select
-                name="productType"
-                value={formData.productType}
-                onChange={handleChange}
-                className="select select-bordered w-full"
+                {...register("productType")}
+                className="select select-bordered w-full focus-within:outline-0"
               >
                 <option value="Returnable">Returnable</option>
                 <option value="Non-returnable">Non-returnable</option>
@@ -89,17 +83,17 @@ const AssetForm = () => {
               </label>
               <input
                 type="number"
-                name="productQuantity"
-                value={formData.productQuantity}
-                onChange={handleChange}
-                className="input input-bordered w-full"
+                {...register("productQuantity", { required: true })}
+                className="input input-bordered w-full focus-within:outline-0"
                 min="1"
-                required
               />
             </div>
 
             <div className="card-actions justify-center mt-6">
-              <button type="submit" className="btn btn-primary w-full">
+              <button
+                type="submit"
+                className="btn btn-primary w-full focus-within:outline-0"
+              >
                 Add Asset
               </button>
             </div>
