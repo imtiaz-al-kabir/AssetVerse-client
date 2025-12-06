@@ -65,7 +65,7 @@ const RequestAsset = () => {
         <input
           type="text"
           placeholder="Search for laptops, chairs, etc..."
-          className="input input-bordered w-full"
+          className="input input-bordered w-full focus-within:outline-0"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />

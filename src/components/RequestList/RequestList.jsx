@@ -15,7 +15,7 @@ const RequestList = () => {
     if (!userInfo) return;
 
     const url =
-      userInfo.role === "HR" ? "/api/requests" : "/api/requests/myrequests";
+      userInfo.role === "hr" ? "/api/requests" : "/api/requests/myrequests";
     try {
       const res = await fetch(url);
       const data = await res.json();
@@ -49,14 +49,14 @@ const RequestList = () => {
 
   return (
     <div
-      className={user?.role === "HR" ? "container mx-auto px-4 mt-8" : "w-full"}
+      className={user?.role === "hr" ? "container mx-auto px-4 mt-8" : "w-full"}
     >
       <div className="flex justify-between items-center mb-4">
-        {user?.role === "HR" && (
+        {user?.role === "hr" && (
           <h2 className="text-2xl font-bold">All Requests</h2>
         )}
-        {user?.role === "Employee" && <div />} {/* Spacer */}
-        {user?.role === "Employee" && (
+        {user?.role === "employee" && <div />} {/* Spacer */}
+        {user?.role === "employee" && (
           <Link to="/requests/new" className="hidden">
             Make Request
           </Link> // Handled in Dashboard
@@ -73,7 +73,7 @@ const RequestList = () => {
               <th>Request Type</th>
               <th>Status</th>
               <th>Date</th>
-              {user?.role === "HR" && <th>Actions</th>}
+              {user?.role === "hr" && <th>Actions</th>}
             </tr>
           </thead>
           <tbody>
@@ -115,7 +115,7 @@ const RequestList = () => {
                   </span>
                 </td>
                 <td>{new Date(request.requestDate).toLocaleDateString()}</td>
-                {user?.role === "HR" && (
+                {user?.role === "hr" && (
                   <td>
                     {request.status === "Pending" && (
                       <div className="btn-group">

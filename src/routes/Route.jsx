@@ -1,4 +1,6 @@
 import { createBrowserRouter } from "react-router";
+import AssetList from "../components/AssetList/AssetList";
+import RequestList from "../components/RequestList/RequestList";
 import HomeLayout from "../layouts/HomeLayout";
 import Login from "../pages/Auth/Login/Login";
 import Register from "../pages/Auth/Register/Register";
@@ -7,6 +9,7 @@ import RegisterHR from "../pages/Auth/RegisterHr/RegisterHR";
 import Dashboard from "../pages/Dashboard/Dashboard";
 import Home from "../pages/Home/Home/Home";
 import MyAssets from "../pages/MyAssets/MyAssets";
+import MyEmployeeList from "../pages/MyEmployeeList/MyEmployeeList";
 import MyTeam from "../pages/MyTeam/MyTeam";
 import NotFound from "../pages/NotFound/NotFound";
 import RequestAsset from "../pages/RequestAsset/RequestAsset";
@@ -52,6 +55,18 @@ const router = createBrowserRouter([
       {
         path: "/request-asset",
         Component: RequestAsset,
+      },
+      {
+        path: "/requests",
+        Component: RequestList,
+      },
+      {
+        path: "/my-employees",
+        Component: MyEmployeeList,
+      },
+      {
+        path: "/assets",
+        Component: AssetList,
       },
     ],
   },
