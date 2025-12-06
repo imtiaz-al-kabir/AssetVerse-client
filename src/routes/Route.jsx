@@ -77,6 +77,11 @@ const router = createBrowserRouter([
         path: "/assets/add",
         Component: AssetForm,
       },
+      {
+        path: "/profile",
+        Component: AssetForm,
+      },
+
     ],
   },
 ]);
