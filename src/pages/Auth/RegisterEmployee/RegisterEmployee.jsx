@@ -41,7 +41,7 @@ const RegisterEmployee = () => {
   };
 
   return (
-    <div className="flex justify-center items-center py-10">
+    <div className="flex justify-center items-center py-10 lg:pt-30">
       <div className="card w-96 bg-base-100 shadow-xl">
         <div className="card-body">
           <h2 className="card-title justify-center text-2xl mb-4">
