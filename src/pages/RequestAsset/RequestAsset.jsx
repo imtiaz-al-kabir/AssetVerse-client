@@ -11,7 +11,7 @@ const RequestAsset = () => {
   const fetchAssets = async () => {
     try {
       // Employee sees all assets from all companies for discovery
-      let query = "/api/assets?";
+      let query = "/assets?";
       if (search) query += `search=${search}&`;
 
       const res = await fetch(query);

@@ -1,45 +1,69 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+import Swal from "sweetalert2";
+import useAxiosBase from "../../hooks/useAxiosBase";
 
 const AssetList = () => {
   const [assets, setAssets] = useState([]);
   const [search, setSearch] = useState("");
   const [filterType, setFilterType] = useState("");
+
+  const axiosBase = useAxiosBase();
   const navigate = useNavigate();
 
-  const fetchAssets = async () => {
-    try {
-      let query = "/api/assets?";
-      if (search) query += `search=${search}&`;
-      if (filterType) query += `type=${filterType}&`;
-
-      const res = await fetch(query);
-      const data = await res.json();
-      setAssets(data.assets || []);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   useEffect(() => {
-    fetchAssets();
-  }, [search, filterType]);
+    let active = true;
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this asset?")) {
+    const loadAssets = async () => {
       try {
-        const res = await fetch(`/api/assets/${id}`, { method: "DELETE" });
-        if (res.ok) {
-          fetchAssets();
+        let query = "assets?";
+        if (search) query += `search=${search}&`;
+        if (filterType) query += `type=${filterType}&`;
+
+        const res = await axiosBase.get(query);
+
+        if (active) {
+          setAssets(res.data.assets || []);
         }
       } catch (err) {
         console.error(err);
       }
-    }
+    };
+
+    loadAssets();
+
+    return () => {
+      active = false; // cleanup to avoid cascading renders
+    };
+  }, [search, filterType]);
+
+  const handleDelete = async (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "This asset will be deleted permanently!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const res = await axiosBase.delete(`/assets/${id}`);
+
+          if (res.data.success) {
+            Swal.fire("Deleted!", "Asset has been removed.", "success");
+          }
+        } catch (err) {
+          Swal.fire("Error!", "Failed to delete asset.", "error");
+        }
+      }
+    });
   };
 
   return (
     <div className="container mx-auto p-4">
+      {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Asset Inventory</h2>
         <button
@@ -55,12 +79,13 @@ const AssetList = () => {
         <input
           type="text"
           placeholder="Search assets..."
-          className="input input-bordered w-full max-w-xs"
+          className="input input-bordered w-full max-w-xs focus-within:outline-0"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
+
         <select
-          className="select select-bordered w-full max-w-xs"
+          className="select select-bordered w-full max-w-xs focus-within:outline-0"
           value={filterType}
           onChange={(e) => setFilterType(e.target.value)}
         >
@@ -70,6 +95,7 @@ const AssetList = () => {
         </select>
       </div>
 
+      {/* Table */}
       <div className="overflow-x-auto">
         <table className="table w-full">
           <thead>
@@ -82,6 +108,7 @@ const AssetList = () => {
               <th>Actions</th>
             </tr>
           </thead>
+
           <tbody>
             {assets.map((asset) => (
               <tr key={asset._id}>
@@ -92,7 +119,9 @@ const AssetList = () => {
                     </div>
                   </div>
                 </td>
+
                 <td className="font-bold">{asset.productName}</td>
+
                 <td>
                   <div
                     className={`badge ${
@@ -104,10 +133,13 @@ const AssetList = () => {
                     {asset.productType}
                   </div>
                 </td>
+
                 <td>
                   {asset.availableQuantity} / {asset.productQuantity}
                 </td>
+
                 <td>{new Date(asset.dateAdded).toLocaleDateString()}</td>
+
                 <td>
                   <button
                     onClick={() => handleDelete(asset._id)}
@@ -118,6 +150,7 @@ const AssetList = () => {
                 </td>
               </tr>
             ))}
+
             {assets.length === 0 && (
               <tr>
                 <td colSpan="6" className="text-center">

@@ -1,5 +1,6 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
+import Swal from "sweetalert2";
 import useAxiosBase from "../../hooks/useAxiosBase";
 
 const AssetForm = () => {
@@ -15,7 +16,7 @@ const AssetForm = () => {
   const handleAsset = async (data) => {
     const formData = {
       productName: data.productName,
-      productType: data.productName,
+      productType: data.productType,
       productQuantity: parseInt(data.productQuantity),
       productImage: data.productImage,
     };
@@ -24,8 +25,15 @@ const AssetForm = () => {
       const res = await axiosBase.post("/assets", formData, {
         withCredentials: true, // important to send/receive cookies
       });
-
-      if (res.status === 200) {
+      console.log(res);
+      if (res.status === 201) {
+        Swal.fire({
+          position: "top-end",
+          icon: "success",
+          title: "New Asset  has been Created",
+          showConfirmButton: false,
+          timer: 1500,
+        });
         // Cookie is automatically stored, no need for localStorage
         navigate("/dashboard");
       }
