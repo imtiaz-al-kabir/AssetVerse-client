@@ -13,16 +13,7 @@ const RequestList = () => {
   const fetchRequests = async () => {
     if (!user) return;
 
-    // Determine endpoint based on role
-    // HR sees all requests at /requests
-    // Employee sees own at /requests/my-requests (need to verify this route exists)
-    // Looking at previous summary, requestRoutes has /my-requests?
-    // Let's assume standard REST: GET /requests for HR (all), GET /requests/my-requests for Employee
-
-    // Actually, let's look at the original code: 
-    // userInfo.role === "hr" ? "/api/requests" : "/api/requests/myrequests";
-    // I need to use the axiosSecure instance which likely has baseURL set.
-    // usage: axiosSecure.get('/requests') or axiosSecure.get('/requests/my-requests')
+  
 
     const url = user.role === "hr" ? "/requests" : "/requests/my-requests";
 
@@ -75,7 +66,7 @@ const RequestList = () => {
 
   return (
     <div
-      className={user?.role === "hr" ? "container mx-auto px-4 mt-8" : "w-full"}
+      className={user?.role === "hr" ? "container mx-auto pb-10 px-4 mt-8" : "w-full"}
     >
       <div className="flex justify-between items-center mb-4">
         {user?.role === "hr" && (
@@ -85,7 +76,7 @@ const RequestList = () => {
         {user?.role === "employee" && (
           <Link to="/requests/new" className="hidden">
             Make Request
-          </Link> // Handled in Dashboard
+          </Link> 
         )}
       </div>
 

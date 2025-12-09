@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import useAxiosSecure from "../../hooks/useAxiosSecure";
 import Swal from "sweetalert2";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const RequestAsset = () => {
   const [assets, setAssets] = useState([]);
@@ -14,16 +14,9 @@ const RequestAsset = () => {
 
   const fetchAssets = async () => {
     try {
-      // Employee sees all assets from all companies for discovery (or filtered by their company if required)
-      // Requirements usually imply seeing assets available to request.
-      // Assuming GET /assets returns all assets for now (or public ones).
-      // Note: useAxiosSecure might attach token, so if backend filters by company, that's good.
       let query = "/assets?";
       if (search) query += `search=${search}&`;
 
-      // Wait, /assets usually returns assets of the logged in HR's company if verifiedHR?
-      // If employee, maybe they see assets of their company?
-      // We need to verify assetRoutes.js for GET / logic.
       const res = await axiosSecure.get(query);
       setAssets(res.data.assets || res.data || []);
     } catch (err) {
@@ -44,21 +37,18 @@ const RequestAsset = () => {
 
   const handleRequest = async () => {
     try {
-      const res = await axiosSecure.post(
-        "/requests",
-        {
-          assetId: selectedAsset._id,
-          requestType: "Request",
-          note,
-        }
-      );
+      const res = await axiosSecure.post("/requests", {
+        assetId: selectedAsset._id,
+        requestType: "Request",
+        note,
+      });
 
       if (res.status === 201 || res.status === 200) {
         Swal.fire({
-          icon: 'success',
-          title: 'Request Sent',
-          text: 'Your request has been sent to HR.',
-          timer: 2000
+          icon: "success",
+          title: "Request Sent",
+          text: "Your request has been sent to HR.",
+          timer: 2000,
         });
         setModalOpen(false);
         setNote("");
@@ -66,9 +56,9 @@ const RequestAsset = () => {
     } catch (err) {
       console.error(err);
       Swal.fire({
-        icon: 'error',
-        title: 'Request Failed',
-        text: err.response?.data?.message || 'Something went wrong.'
+        icon: "error",
+        title: "Request Failed",
+        text: err.response?.data?.message || "Something went wrong.",
       });
     }
   };

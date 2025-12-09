@@ -11,6 +11,9 @@ const MyAssets = () => {
   const axiosSecure = useAxiosSecure();
 
   const fetchAssets = async () => {
+
+
+
     try {
       let query = "/assigned-assets?";
       if (search) query += `search=${search}&`;

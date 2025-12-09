@@ -53,6 +53,7 @@ const Navbar = () => {
       >
         Dashboard
       </NavLink>
+
       <NavLink
         to="/assets"
         className={({ isActive }) => (isActive ? activeClass : normalClass)}
@@ -113,7 +114,6 @@ const Navbar = () => {
         >
           <img src="/logo.png" alt="" className="size-12" />
           <h1 className="-ms-3">AssetVerse</h1>
-         
         </NavLink>
 
         {/* DESKTOP NAV */}
@@ -207,6 +207,7 @@ const Navbar = () => {
                     <NavLink to="/dashboard" onClick={() => setMenuOpen(false)}>
                       Dashboard
                     </NavLink>
+
                     <NavLink to="/assets" onClick={() => setMenuOpen(false)}>
                       Asset List
                     </NavLink>

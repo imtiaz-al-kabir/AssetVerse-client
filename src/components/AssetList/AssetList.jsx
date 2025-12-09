@@ -1,43 +1,45 @@
-import { useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { useNavigate } from "react-router";
 import Swal from "sweetalert2";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const AssetList = () => {
-  const [assets, setAssets] = useState([]);
   const [search, setSearch] = useState("");
   const [filterType, setFilterType] = useState("");
 
   const axiosSecure = useAxiosSecure();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    let active = true;
+  const { data, isLoading } = useQuery({
+    queryKey: ["assets", search, filterType],
+    queryFn: async () => {
+      let query = "assets?";
+      if (search) query += `search=${search}&`;
+      if (filterType) query += `type=${filterType}&`;
 
-    const loadAssets = async () => {
-      try {
-        let query = "assets?";
-        if (search) query += `search=${search}&`;
-        if (filterType) query += `type=${filterType}&`;
+      const res = await axiosSecure.get(query);
+      return res.data.assets || [];
+    },
+  });
 
-        const res = await axiosSecure.get(query);
+  const assets = data || [];
 
-        if (active) {
-          setAssets(res.data.assets || []);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    };
+  const deleteMutation = useMutation({
+    mutationFn: async (id) => {
+      return axiosSecure.delete(`/assets/${id}`);
+    },
+    onSuccess: () => {
+      Swal.fire("Deleted!", "Asset has been removed.", "success");
+      queryClient.invalidateQueries(["assets"]);
+    },
+    onError: () => {
+      Swal.fire("Error!", "Failed to delete asset.", "error");
+    },
+  });
 
-    loadAssets();
-
-    return () => {
-      active = false; // cleanup to avoid cascading renders
-    };
-  }, [search, filterType, axiosSecure]);
-
-  const handleDelete = async (id) => {
+  const handleDelete = (id) => {
     Swal.fire({
       title: "Are you sure?",
       text: "This asset will be deleted permanently!",
@@ -46,23 +48,15 @@ const AssetList = () => {
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
       confirmButtonText: "Yes, delete it!",
-    }).then(async (result) => {
+    }).then((result) => {
       if (result.isConfirmed) {
-        try {
-          const res = await axiosSecure.delete(`/assets/${id}`);
-
-          if (res.data.success) {
-            Swal.fire("Deleted!", "Asset has been removed.", "success");
-          }
-        } catch (err) {
-          Swal.fire("Error!", "Failed to delete asset.", "error");
-        }
+        deleteMutation.mutate(id);
       }
     });
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto py-10">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Asset Inventory</h2>
@@ -124,10 +118,11 @@ const AssetList = () => {
 
                 <td>
                   <div
-                    className={`badge ${asset.productType === "Returnable"
-                      ? "badge-warning"
-                      : "badge-ghost"
-                      }`}
+                    className={`badge ${
+                      asset.productType === "Returnable"
+                        ? "badge-warning"
+                        : "badge-ghost"
+                    }`}
                   >
                     {asset.productType}
                   </div>
