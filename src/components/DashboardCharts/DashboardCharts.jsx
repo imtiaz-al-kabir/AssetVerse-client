@@ -12,26 +12,33 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import useAxiosBase from "../../hooks/useAxiosBase";
 import Loading from "../../pages/Loading/Loading";
 
 const DashboardCharts = () => {
   const [stats, setStats] = useState({ pieData: [], barData: [] });
   const [loading, setLoading] = useState(true);
 
+  const axiosBase = useAxiosBase();
+
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await fetch("/api/stats/hr");
-        const data = await res.json();
-        setStats(data);
+        const res = await axiosBase.get("/stats/hr", {
+          withCredentials: true,
+        });
+
+        // axios returns data inside res.data
+        setStats(res.data);
       } catch (error) {
         console.error("Error fetching stats:", error);
       } finally {
         setLoading(false);
       }
     };
+
     fetchStats();
-  }, []);
+  }, [axiosBase]);
 
   const COLORS = ["#0088FE", "#FFBB28"]; // Blue for Returnable, Yellow for Non-Returnable
 
