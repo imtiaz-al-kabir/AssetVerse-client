@@ -2,6 +2,7 @@ import About from "../About/About";
 import Hero from "../Hero/Hero";
 import Packages from "../Packages/Packages";
 import Testimonials from "../Testimonials/Testimonials";
+import Features from "../Features/Features";
 
 const Home = () => {
   return (
@@ -12,11 +13,12 @@ const Home = () => {
       {/* About Section */}
       <About />
 
+      <Features />
       {/* Packages Section */}
 
       <Packages />
       {/* Testimonials */}
-     <Testimonials/>
+      <Testimonials />
     </div>
   );
 };

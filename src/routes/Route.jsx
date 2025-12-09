@@ -14,6 +14,10 @@ import MyEmployeeList from "../pages/MyEmployeeList/MyEmployeeList";
 import MyTeam from "../pages/MyTeam/MyTeam";
 import NotFound from "../pages/NotFound/NotFound";
 import RequestAsset from "../pages/RequestAsset/RequestAsset";
+import RequestForm from "../components/RequestForm/RequestForm";
+import Profile from "../pages/Profile/Profile";
+import Subscription from "../pages/Subscription/Subscription";
+import PaymentSuccess from "../pages/Subscription/PaymentSuccess";
 
 const router = createBrowserRouter([
   {
@@ -63,7 +67,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/requests/new",
-        Component: RequestList,
+        Component: RequestForm,
       },
       {
         path: "/my-employees",
@@ -79,7 +83,15 @@ const router = createBrowserRouter([
       },
       {
         path: "/profile",
-        Component: AssetForm,
+        Component: Profile,
+      },
+      {
+        path: "/subscription",
+        Component: Subscription,
+      },
+      {
+        path: "/payment/success",
+        Component: PaymentSuccess,
       },
 
     ],

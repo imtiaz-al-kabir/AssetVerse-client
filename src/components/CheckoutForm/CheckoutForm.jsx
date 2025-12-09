@@ -4,14 +4,19 @@ import {
     useStripe,
     useElements
 } from '@stripe/react-stripe-js';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import useAuth from '../../hooks/useAuth';
+import useAxiosSecure from '../../hooks/useAxiosSecure';
+import Swal from 'sweetalert2';
 
-export default function CheckoutForm() {
+export default function CheckoutForm({ selectedPackage }) {
     const stripe = useStripe();
     const elements = useElements();
     const [message, setMessage] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
+    const { user } = useAuth();
+    const axiosSecure = useAxiosSecure();
 
     useEffect(() => {
         if (!stripe) {
@@ -30,8 +35,6 @@ export default function CheckoutForm() {
             switch (paymentIntent.status) {
                 case "succeeded":
                     setMessage("Payment succeeded!");
-                    // Ideally update user status here
-                    setTimeout(() => navigate('/dashboard'), 2000);
                     break;
                 case "processing":
                     setMessage("Your payment is processing.");
@@ -55,18 +58,49 @@ export default function CheckoutForm() {
 
         setIsLoading(true);
 
-        const { error } = await stripe.confirmPayment({
+        const { error, paymentIntent } = await stripe.confirmPayment({
             elements,
             confirmParams: {
-                // Make sure to change this to your payment completion page
                 return_url: `${window.location.origin}/subscription`,
             },
+            redirect: 'if_required'
         });
 
-        if (error.type === "card_error" || error.type === "validation_error") {
-            setMessage(error.message);
-        } else {
-            setMessage("An unexpected error occurred.");
+        if (error) {
+            if (error.type === "card_error" || error.type === "validation_error") {
+                setMessage(error.message);
+            } else {
+                setMessage("An unexpected error occurred.");
+            }
+        } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+            setMessage("Payment succeeded!");
+
+            // Save payment info to database
+            const paymentInfo = {
+                hrEmail: user.email,
+                packageName: selectedPackage.name,
+                employeeLimit: selectedPackage.limit,
+                amount: selectedPackage.price,
+                transactionId: paymentIntent.id,
+                status: 'Success'
+            };
+
+            try {
+                const res = await axiosSecure.post('/payments', paymentInfo);
+                if (res.data.insertedId) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Payment Successful',
+                        text: `You have successfully upgraded to ${selectedPackage.name} package!`,
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                    navigate('/dashboard');
+                }
+            } catch (err) {
+                console.error('Error saving payment info', err);
+                setMessage("Payment succeeded but failed to update record. Please contact support.");
+            }
         }
 
         setIsLoading(false);
@@ -77,11 +111,11 @@ export default function CheckoutForm() {
             <PaymentElement id="payment-element" />
             <button disabled={isLoading || !stripe || !elements} id="submit" className="btn btn-primary w-full mt-4">
                 <span id="button-text">
-                    {isLoading ? "Paying..." : "Pay now"}
+                    {isLoading ? "Processing..." : `Pay $${selectedPackage.price}`}
                 </span>
             </button>
             {/* Show any error or success messages */}
-            {message && <div id="payment-message" className="alert alert-info mt-4">{message}</div>}
+            {message && <div id="payment-message" className="alert alert-info mt-4 text-sm">{message}</div>}
         </form>
     );
 }

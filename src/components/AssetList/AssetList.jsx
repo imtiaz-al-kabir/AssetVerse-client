@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import Swal from "sweetalert2";
-import useAxiosBase from "../../hooks/useAxiosBase";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const AssetList = () => {
   const [assets, setAssets] = useState([]);
   const [search, setSearch] = useState("");
   const [filterType, setFilterType] = useState("");
 
-  const axiosBase = useAxiosBase();
+  const axiosSecure = useAxiosSecure();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,7 +20,7 @@ const AssetList = () => {
         if (search) query += `search=${search}&`;
         if (filterType) query += `type=${filterType}&`;
 
-        const res = await axiosBase.get(query);
+        const res = await axiosSecure.get(query);
 
         if (active) {
           setAssets(res.data.assets || []);
@@ -35,7 +35,7 @@ const AssetList = () => {
     return () => {
       active = false; // cleanup to avoid cascading renders
     };
-  }, [search, filterType]);
+  }, [search, filterType, axiosSecure]);
 
   const handleDelete = async (id) => {
     Swal.fire({
@@ -49,7 +49,7 @@ const AssetList = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axiosBase.delete(`/assets/${id}`);
+          const res = await axiosSecure.delete(`/assets/${id}`);
 
           if (res.data.success) {
             Swal.fire("Deleted!", "Asset has been removed.", "success");
@@ -124,11 +124,10 @@ const AssetList = () => {
 
                 <td>
                   <div
-                    className={`badge ${
-                      asset.productType === "Returnable"
-                        ? "badge-warning"
-                        : "badge-ghost"
-                    }`}
+                    className={`badge ${asset.productType === "Returnable"
+                      ? "badge-warning"
+                      : "badge-ghost"
+                      }`}
                   >
                     {asset.productType}
                   </div>

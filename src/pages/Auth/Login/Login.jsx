@@ -1,29 +1,34 @@
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router";
-import useAxiosBase from "../../../hooks/useAxiosBase";
-
+import useAuth from "../../../hooks/useAuth";
+import Swal from "sweetalert2";
 
 const Login = () => {
   const navigate = useNavigate();
-  const axiosBase = useAxiosBase();
+  const { login } = useAuth();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
+
   const handleLogin = async (data) => {
     try {
-      const res = await axiosBase.post("/users/login", data, {
-        withCredentials: true, // important to send/receive cookies
+      await login(data.email, data.password);
+      Swal.fire({
+        icon: "success",
+        title: "Logged in successfully",
+        showConfirmButton: false,
+        timer: 1500,
       });
-
-      if (res.status === 200) {
-        // Cookie is automatically stored, no need for localStorage
-        navigate("/dashboard");
-      }
+      navigate("/");
     } catch (error) {
       console.error(error);
-      alert(error.response?.data?.message || "Login failed");
+      Swal.fire({
+        icon: "error",
+        title: "Login Failed",
+        text: error.response?.data?.message || "Something went wrong",
+      });
     }
   };
 

@@ -1,11 +1,11 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
-import useAxiosBase from "../../../hooks/useAxiosBase";
+import useAuth from "../../../hooks/useAuth";
+import Swal from "sweetalert2";
 
 const RegisterHR = () => {
   const navigate = useNavigate();
-
-  const axiosBase = useAxiosBase();
+  const { register: registerUser } = useAuth();
   const {
     register,
     handleSubmit,
@@ -24,17 +24,21 @@ const RegisterHR = () => {
     };
 
     try {
-      const res = await axiosBase.post("/users/register", formData, {
-        withCredentials: true, // send cookie
+      await registerUser(formData);
+      Swal.fire({
+        icon: "success",
+        title: "Registration Successful",
+        showConfirmButton: false,
+        timer: 1500,
       });
-
-      if (res.status === 201) {
-        // No localStorage needed; cookie handles auth
-        navigate("/dashboard");
-      }
+      navigate("/");
     } catch (error) {
       console.error(error);
-      alert(error.response?.data?.message || "Registration failed");
+      Swal.fire({
+        icon: "error",
+        title: "Registration Failed",
+        text: error.response?.data?.message || "Something went wrong",
+      });
     }
   };
   return (
@@ -84,7 +88,7 @@ const RegisterHR = () => {
                 placeholder="https://..."
                 required
               />
-               {errors.companyLogo && (
+              {errors.companyLogo && (
                 <p className="text-red-500">{errors.companyLogo.message}</p>
               )}
             </div>

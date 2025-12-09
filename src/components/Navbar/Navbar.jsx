@@ -1,246 +1,155 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { HiMenu, HiX } from "react-icons/hi";
 import { NavLink, useNavigate } from "react-router";
-import useAxiosBase from "../../hooks/useAxiosBase";
+import useAuth from "../../hooks/useAuth";
 
 const Navbar = () => {
-  const [user, setUser] = useState(null);
+  const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
-
   const navigate = useNavigate();
-  const axiosBase = useAxiosBase();
 
-  // Fetch logged-in user from cookie
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await axiosBase.get("/users/me", { withCredentials: true });
-        setUser(res.data);
-      } catch {
-        setUser(null);
-      }
-    };
-    fetchUser();
-  }, [axiosBase]);
-
-  // Logout function
   const handleLogout = async () => {
     try {
-      await axiosBase.post("/users/logout", {}, { withCredentials: true });
-      setUser(null);
+      await logout();
       navigate("/login");
-    } catch (error) {}
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
   };
 
   const activeClass = "text-primary font-bold border-b-2 border-primary pb-1";
-  const normalClass = "hover:text-primary transition";
+  const normalClass = "hover:text-primary transition font-medium";
+
+  const publicLinks = (
+    <>
+      <NavLink to="/" className={({ isActive }) => (isActive ? activeClass : normalClass)}>
+        Home
+      </NavLink>
+      {!user && (
+        <>
+          <NavLink to="/register/employee" className={({ isActive }) => (isActive ? activeClass : normalClass)}>
+            Join as Employee
+          </NavLink>
+          <NavLink to="/register/hr" className={({ isActive }) => (isActive ? activeClass : normalClass)}>
+            Join as HR Manager
+          </NavLink>
+        </>
+      )}
+    </>
+  );
+
+  // Role-based Links for Navbar
+  const hrLinks = (
+    <>
+      <NavLink to="/dashboard" className={({ isActive }) => (isActive ? activeClass : normalClass)}>Dashboard</NavLink>
+      <NavLink to="/assets" className={({ isActive }) => (isActive ? activeClass : normalClass)}>Asset List</NavLink>
+      <NavLink to="/assets/add" className={({ isActive }) => (isActive ? activeClass : normalClass)}>Add Asset</NavLink>
+      <NavLink to="/requests" className={({ isActive }) => (isActive ? activeClass : normalClass)}>All Requests</NavLink>
+      <NavLink to="/my-employees" className={({ isActive }) => (isActive ? activeClass : normalClass)}>My Employees</NavLink>
+    </>
+  );
+
+  const employeeLinks = (
+    <>
+      <NavLink to="/my-assets" className={({ isActive }) => (isActive ? activeClass : normalClass)}>My Assets</NavLink>
+      <NavLink to="/my-team" className={({ isActive }) => (isActive ? activeClass : normalClass)}>My Team</NavLink>
+      <NavLink to="/request-asset" className={({ isActive }) => (isActive ? activeClass : normalClass)}>Request Asset</NavLink>
+    </>
+  );
 
   return (
-    <nav className="bg-base-100 shadow-md sticky top-0 z-50 px-4 py-4 md:px-10">
+    <nav className="bg-base-100 shadow-md sticky top-0 z-50 px-4 py-3 md:px-10">
       <div className="container mx-auto flex justify-between items-center">
-
-        {/* LEFT - LOGO */}
-        <NavLink to="/" className="text-2xl font-bold text-primary">
+        {/* LOGO */}
+        <NavLink to="/" className="text-2xl font-bold text-primary flex items-center gap-2">
+          {/* <img src="/logo.png" alt="" className="w-8 h-8 hidden" /> */}
           AssetVerse
         </NavLink>
 
-        {/* CENTER (Desktop Navigation) */}
-        <div className="hidden md:flex gap-8 items-center flex-1 justify-center">
+        {/* DESKTOP NAV */}
+        <div className="hidden lg:flex gap-6 items-center">
+          {publicLinks}
+          {user && user.role === "hr" && hrLinks}
+          {user && user.role === "employee" && employeeLinks}
+        </div>
+
+        {/* AUTH STATE / DROPDOWN */}
+        <div className="hidden lg:flex items-center gap-3">
           {!user ? (
-            <>
-              <NavLink
-                to="/"
-                className={({ isActive }) =>
-                  isActive ? activeClass : normalClass
-                }
-              >
-                Home
-              </NavLink>
-
-              <NavLink
-                to="/register/employee"
-                className={({ isActive }) =>
-                  isActive ? activeClass : normalClass
-                }
-              >
-                Join as Employee
-              </NavLink>
-
-              <NavLink
-                to="/register/hr"
-                className={({ isActive }) =>
-                  isActive ? activeClass : normalClass
-                }
-              >
-                Join as HR Manager
-              </NavLink>
-            </>
+            <NavLink to="/login" className="btn btn-primary btn-sm px-6">
+              Login
+            </NavLink>
           ) : (
-            <>
-              {user.role === "hr" && (
-                <>
-                  <NavLink to="/assets" className={normalClass}>
-                    Assets
-                  </NavLink>
-                  <NavLink to="/my-employees" className={normalClass}>
-                    My Team
-                  </NavLink>
-                  <NavLink to="/requests" className={normalClass}>
-                    Requests
-                  </NavLink>
-                </>
-              )}
-
-              {user.role === "employee" && (
-                <>
-                  <NavLink to="/my-assets" className={normalClass}>
-                    My Assets
-                  </NavLink>
-                  <NavLink to="/my-team" className={normalClass}>
-                    My Team
-                  </NavLink>
-                  <NavLink to="/request-asset" className={normalClass}>
-                    Request Asset
-                  </NavLink>
-                </>
-              )}
-
-              <NavLink to="/dashboard" className={normalClass}>
-                Dashboard
-              </NavLink>
-            </>
+            <div className="dropdown dropdown-end">
+              <label tabIndex={0} className="btn btn-ghost btn-circle avatar tooltip tooltip-bottom" data-tip={user.name}>
+                <div className="w-10 rounded-full border border-primary">
+                  <img src={user.profileImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}`} alt={user.name} />
+                </div>
+              </label>
+              <ul tabIndex={0} className="mt-3 z-1 p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
+                <li className="menu-title text-center opacity-100">
+                  <div className="flex flex-col items-center gap-1">
+                    <span className="font-bold text-lg">{user.name}</span>
+                    <span className="badge badge-accent badge-sm uppercase">{user.role}</span>
+                  </div>
+                </li>
+                <div className="divider my-1"></div>
+                <li><NavLink to="/profile">Profile Settings</NavLink></li>
+                <li><button onClick={handleLogout} className="text-error font-bold">Logout</button></li>
+              </ul>
+            </div>
           )}
         </div>
 
-        {/* RIGHT - PROFILE */}
-        <div className="hidden md:flex items-center gap-3">
-          {!user ? (
-            <>
-              <NavLink to="/login" className="btn btn-primary">
-                Login
-              </NavLink>
-            </>
-          ) : (
-            <>
-              {/* Avatar */}
-              <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary">
-                <img
-                  src={
-                    user.profileImage ||
-                    `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                      user.name
-                    )}`
-                  }
-                  alt="avatar"
-                />
-              </div>
-
-              <div className="text-right">
-                <p className="font-bold">{user.name}</p>
-                <small className="text-gray-500">{user.role}</small>
-              </div>
-
-              <button onClick={handleLogout} className="btn btn-sm btn-error">
-                Logout
-              </button>
-            </>
-          )}
-        </div>
-
-        {/* Mobile toggle button */}
-        <button
-          className="md:hidden text-3xl"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
+        {/* MOBILE TOGGLE */}
+        <button className="lg:hidden text-3xl text-gray-700" onClick={() => setMenuOpen(!menuOpen)}>
           {menuOpen ? <HiX /> : <HiMenu />}
         </button>
       </div>
 
       {/* MOBILE MENU */}
       {menuOpen && (
-        <div className="md:hidden mt-3 bg-base-100 rounded-lg shadow-inner p-4">
-          {!user ? (
-            <div className="space-y-4">
-              <NavLink to="/" onClick={() => setMenuOpen(false)}>
-                Home
-              </NavLink>
-
-              <NavLink
-                to="/register/employee"
-                onClick={() => setMenuOpen(false)}
-              >
-                Join as Employee
-              </NavLink>
-
-              <NavLink to="/register/hr" onClick={() => setMenuOpen(false)}>
-                Join as HR Manager
-              </NavLink>
-
-              <NavLink to="/login" onClick={() => setMenuOpen(false)}>
-                Login
-              </NavLink>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <img
-                  className="w-12 h-12 rounded-full border-2 border-primary"
-                  src={
-                    user.profileImage ||
-                    `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                      user.name
-                    )}`
-                  }
-                  alt=""
-                />
-                <div>
-                  <p className="font-bold">{user.name}</p>
-                  <small className="text-gray-500">{user.role}</small>
+        <div className="lg:hidden mt-4 bg-base-100 rounded-lg shadow-lg p-4 border border-base-200">
+          <div className="flex flex-col gap-4">
+            {publicLinks}
+            {!user ? (
+              <NavLink to="/login" className="btn btn-primary w-full" onClick={() => setMenuOpen(false)}>Login</NavLink>
+            ) : (
+              <>
+                <div className="divider my-0">MENU</div>
+                {user.role === "hr" && (
+                  <>
+                    <NavLink to="/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</NavLink>
+                    <NavLink to="/assets" onClick={() => setMenuOpen(false)}>Asset List</NavLink>
+                    <NavLink to="/assets/add" onClick={() => setMenuOpen(false)}>Add Asset</NavLink>
+                    <NavLink to="/requests" onClick={() => setMenuOpen(false)}>All Requests</NavLink>
+                    <NavLink to="/my-employees" onClick={() => setMenuOpen(false)}>Employee List</NavLink>
+                  </>
+                )}
+                {user.role === "employee" && (
+                  <>
+                    <NavLink to="/my-assets" onClick={() => setMenuOpen(false)}>My Assets</NavLink>
+                    <NavLink to="/my-team" onClick={() => setMenuOpen(false)}>My Team</NavLink>
+                    <NavLink to="/request-asset" onClick={() => setMenuOpen(false)}>Request Asset</NavLink>
+                  </>
+                )}
+                <div className="divider my-0">MY ACCOUNT</div>
+                <div className="flex items-center gap-2 px-2">
+                  <div className="avatar">
+                    <div className="w-8 rounded-full">
+                      <img src={user.profileImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}`} alt={user.name} />
+                    </div>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-bold text-sm">{user.name}</span>
+                    <span className="text-xs badge badge-ghost">{user.role}</span>
+                  </div>
                 </div>
-              </div>
-
-              <div className="divider"></div>
-
-              <NavLink to="/dashboard" onClick={() => setMenuOpen(false)}>
-                Dashboard
-              </NavLink>
-
-              {user.role === "hr" && (
-                <>
-                  <NavLink to="/assets" onClick={() => setMenuOpen(false)}>
-                    Assets
-                  </NavLink>
-                  <NavLink to="/my-employees" onClick={() => setMenuOpen(false)}>
-                    My Team
-                  </NavLink>
-                  <NavLink to="/requests" onClick={() => setMenuOpen(false)}>
-                    Requests
-                  </NavLink>
-                </>
-              )}
-
-              {user.role === "employee" && (
-                <>
-                  <NavLink to="/my-assets" onClick={() => setMenuOpen(false)}>
-                    My Assets
-                  </NavLink>
-                  <NavLink to="/my-team" onClick={() => setMenuOpen(false)}>
-                    My Team
-                  </NavLink>
-                  <NavLink
-                    to="/request-asset"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    Request Asset
-                  </NavLink>
-                </>
-              )}
-
-              <button className="btn btn-error w-full" onClick={handleLogout}>
-                Logout
-              </button>
-            </div>
-          )}
+                <NavLink to="/profile" onClick={() => setMenuOpen(false)} className="btn btn-sm btn-ghost justify-start content-center">Profile Settings</NavLink>
+                <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="btn btn-error btn-sm w-full mt-2">Logout</button>
+              </>
+            )}
+          </div>
         </div>
       )}
     </nav>

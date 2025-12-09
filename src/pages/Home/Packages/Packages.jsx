@@ -1,32 +1,45 @@
 import { motion } from "motion/react";
+
+import { useEffect, useState } from "react";
+import useAxiosBase from "../../../hooks/useAxiosBase";
+
 const Packages = () => {
-  const packages = [
-    {
-      name: "Basic",
-      employeeLimit: 5,
-      price: 5,
-      features: ["Asset Tracking", "Employee Management", "Basic Support"],
-      color: "border-primary",
-    },
-    {
-      name: "Standard",
-      employeeLimit: 10,
-      price: 8,
-      features: [
-        "All Basic features",
-        "Advanced Analytics",
-        "Priority Support",
-      ],
-      color: "border-secondary",
-    },
-    {
-      name: "Premium",
-      employeeLimit: 20,
-      price: 15,
-      features: ["All Standard features", "Custom Branding", "24/7 Support"],
-      color: "border-accent",
-    },
-  ];
+  const [packages, setPackages] = useState([]);
+  const axiosBase = useAxiosBase();
+
+  useEffect(() => {
+    const fetchPackages = async () => {
+      try {
+        const res = await axiosBase.get("/packages");
+        if (res.data && res.data.length > 0) {
+          setPackages(res.data);
+        } else {
+          // Fallback data if DB is empty
+          setPackages([
+            { name: "Basic", price: 5, employeeLimit: 5, features: ["Up to 5 Employees", "Basic Support", "Asset Tracking"] },
+            { name: "Standard", price: 8, employeeLimit: 10, features: ["Up to 10 Employees", "Priority Support", "Basic Analytics"] },
+            { name: "Premium", price: 15, employeeLimit: 20, features: ["Up to 20 Employees", "Full Support", "Advanced Analytics"] },
+          ]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch packages", error);
+        // Fallback on error too
+        setPackages([
+          { name: "Basic", price: 5, employeeLimit: 5, features: ["Up to 5 Employees", "Basic Support", "Asset Tracking"] },
+          { name: "Standard", price: 8, employeeLimit: 10, features: ["Up to 10 Employees", "Priority Support", "Basic Analytics"] },
+          { name: "Premium", price: 15, employeeLimit: 20, features: ["Up to 20 Employees", "Full Support", "Advanced Analytics"] },
+        ]);
+      }
+    }
+    fetchPackages();
+  }, [axiosBase]);
+
+  // Fallback or coloring logic could be added
+  const getColor = (index) => {
+    const colors = ["border-primary", "border-secondary", "border-accent"];
+    return colors[index % colors.length];
+  }
+
   return (
     <div className="py-20 bg-base-100">
       <div className="container mx-auto px-4 text-center">
@@ -38,7 +51,7 @@ const Packages = () => {
             <motion.div
               key={i}
               whileHover={{ scale: 1.05 }}
-              className={`card w-full max-w-sm bg-base-100 shadow-xl border-t-4 ${pkg.color}`}
+              className={`card w-full max-w-sm bg-base-100 shadow-xl border-t-4 ${getColor(i)}`}
             >
               <div className="card-body items-center text-center">
                 <h2 className="card-title text-2xl">{pkg.name}</h2>

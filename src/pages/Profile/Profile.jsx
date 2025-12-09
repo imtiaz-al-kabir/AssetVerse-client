@@ -1,24 +1,22 @@
 import { useEffect, useState } from "react";
+import useAuth from "../../hooks/useAuth";
+import Swal from "sweetalert2";
 
 const Profile = () => {
-  const [user, setUser] = useState(null);
+  const { user, updateUser } = useAuth();
   const [name, setName] = useState("");
   const [profileImage, setProfileImage] = useState("");
   const [companyLogo, setCompanyLogo] = useState(""); // Only for HR
-  const [successMsg, setSuccessMsg] = useState("");
 
   useEffect(() => {
-    const userInfo = localStorage.getItem("userInfo");
-    if (userInfo) {
-      const parsed = JSON.parse(userInfo);
-      setUser(parsed);
-      setName(parsed.name);
-      setProfileImage(parsed.profileImage || "");
-      if (parsed.role === "hr") {
-        setCompanyLogo(parsed.companyLogo || "");
+    if (user) {
+      setName(user.name);
+      setProfileImage(user.profileImage || "");
+      if (user.role === "hr") {
+        setCompanyLogo(user.companyLogo || "");
       }
     }
-  }, []);
+  }, [user]);
 
   const handleUpdate = async (e) => {
     e.preventDefault();
@@ -26,33 +24,26 @@ const Profile = () => {
       const body = { name, profileImage };
       if (user.role === "hr") body.companyLogo = companyLogo;
 
-      const res = await fetch("/api/users/profile", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+      await updateUser(body);
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Profile Updated',
+        showConfirmButton: false,
+        timer: 1500
       });
 
-      if (res.ok) {
-        const updated = await res.json();
-        // Merge needed token? No, token is cookie. Just update user info.
-        // We should preserve token if stored? Wait, current impl doesn't store token in localStorage, only userInfo.
-        // Actually authController returns a new object. Use that.
-
-        // If the backend response doesn't include the 'token' but we need it?
-        // The cookie is HttpOnly, so frontend doesn't manage it.
-        // We just update the userInfo object.
-
-        localStorage.setItem("userInfo", JSON.stringify(updated));
-        setUser(updated);
-        setSuccessMsg("Profile updated successfully!");
-        setTimeout(() => setSuccessMsg(""), 3000);
-      }
     } catch (err) {
       console.error(err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Update Failed',
+        text: err.response?.data?.message || 'Something went wrong'
+      });
     }
   };
 
-  if (!user) return <div>Loading...</div>;
+  if (!user) return <div className="flex justify-center p-10"><span className="loading loading-spinner loading-lg"></span></div>;
 
   return (
     <div className="container mx-auto p-4 max-w-lg">
@@ -84,7 +75,7 @@ const Profile = () => {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="input input-bordered w-full"
+                className="input input-bordered w-full focus-within:outline-0"
               />
             </div>
 
@@ -108,7 +99,7 @@ const Profile = () => {
                 type="text"
                 value={profileImage}
                 onChange={(e) => setProfileImage(e.target.value)}
-                className="input input-bordered w-full"
+                className="input input-bordered w-full focus-within:outline-0"
                 placeholder="https://..."
               />
             </div>
@@ -122,7 +113,7 @@ const Profile = () => {
                   type="text"
                   value={companyLogo}
                   onChange={(e) => setCompanyLogo(e.target.value)}
-                  className="input input-bordered w-full"
+                  className="input input-bordered w-full focus-within:outline-0"
                   placeholder="https://..."
                 />
               </div>
@@ -133,12 +124,6 @@ const Profile = () => {
                 Update Profile
               </button>
             </div>
-
-            {successMsg && (
-              <div className="alert alert-success mt-4 p-2 text-sm">
-                {successMsg}
-              </div>
-            )}
           </form>
         </div>
       </div>

@@ -1,17 +1,15 @@
 import { useEffect, useState } from "react";
-import useAxiosBase from "../../hooks/useAxiosBase";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 import Loading from "../Loading/Loading";
 import Swal from "sweetalert2";
 
 const MyEmployeeList = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
-  const axiosBase = useAxiosBase();
+  const axiosSecure = useAxiosSecure();
   const fetchEmployees = async () => {
-  try {
-      const res = await axiosBase.get("/employees/my-team", {
-        withCredentials: true,
-      });
+    try {
+      const res = await axiosSecure.get("/employees/my-team");
 
       setEmployees(res.data);
     } catch (err) {
@@ -25,7 +23,7 @@ const MyEmployeeList = () => {
     fetchEmployees();
   }, []);
 
-   const handleRemove = async (id) => {
+  const handleRemove = async (id) => {
     const result = await Swal.fire({
       title: "Are you sure?",
       text: "This employee will be removed from your team!",
@@ -38,9 +36,7 @@ const MyEmployeeList = () => {
 
     if (result.isConfirmed) {
       try {
-        const res = await axiosBase.delete(`/employees/${id}`, {
-          withCredentials: true,
-        });
+        const res = await axiosSecure.delete(`/employees/${id}`);
 
         if (res.status === 200) {
           Swal.fire("Removed!", "Employee has been removed.", "success");

@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import Swal from "sweetalert2";
 
 const RequestAsset = () => {
   const [assets, setAssets] = useState([]);
@@ -8,15 +10,22 @@ const RequestAsset = () => {
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [note, setNote] = useState("");
 
+  const axiosSecure = useAxiosSecure();
+
   const fetchAssets = async () => {
     try {
-      // Employee sees all assets from all companies for discovery
+      // Employee sees all assets from all companies for discovery (or filtered by their company if required)
+      // Requirements usually imply seeing assets available to request.
+      // Assuming GET /assets returns all assets for now (or public ones).
+      // Note: useAxiosSecure might attach token, so if backend filters by company, that's good.
       let query = "/assets?";
       if (search) query += `search=${search}&`;
 
-      const res = await fetch(query);
-      const data = await res.json();
-      setAssets(data.assets || []);
+      // Wait, /assets usually returns assets of the logged in HR's company if verifiedHR?
+      // If employee, maybe they see assets of their company?
+      // We need to verify assetRoutes.js for GET / logic.
+      const res = await axiosSecure.get(query);
+      setAssets(res.data.assets || res.data || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -26,7 +35,7 @@ const RequestAsset = () => {
 
   useEffect(() => {
     fetchAssets();
-  }, [search]);
+  }, [search, axiosSecure]);
 
   const openRequestModal = (asset) => {
     setSelectedAsset(asset);
@@ -35,25 +44,32 @@ const RequestAsset = () => {
 
   const handleRequest = async () => {
     try {
-      const res = await fetch("/api/requests", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      const res = await axiosSecure.post(
+        "/requests",
+        {
           assetId: selectedAsset._id,
-          requestType: "Request", // Default
-          note: note,
-        }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        alert("Request sent successfully!");
+          requestType: "Request",
+          note,
+        }
+      );
+
+      if (res.status === 201 || res.status === 200) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Request Sent',
+          text: 'Your request has been sent to HR.',
+          timer: 2000
+        });
         setModalOpen(false);
         setNote("");
-      } else {
-        alert(data.message);
       }
     } catch (err) {
       console.error(err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Request Failed',
+        text: err.response?.data?.message || 'Something went wrong.'
+      });
     }
   };
 

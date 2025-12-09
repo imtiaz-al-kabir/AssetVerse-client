@@ -1,21 +1,27 @@
 import { useEffect, useState } from "react";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import Loading from "../Loading/Loading";
 
 const MyTeam = () => {
   const [teamData, setTeamData] = useState([]); // List of employees
   const [companies, setCompanies] = useState([]);
   const [selectedCompanyId, setSelectedCompanyId] = useState("");
   const [loading, setLoading] = useState(true);
-
+  const axiosSecure = useAxiosSecure();
   // Initial load: Get list of affiliated companies
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
-        const res = await fetch("/api/employees/team-list"); // No param = get companies
-        const data = await res.json();
+        const res = await axiosSecure.get("/employees/team-list");
+
+        // axios returns data inside res.data
+        const data = res.data;
+
         if (data.type === "companies") {
           setCompanies(data.data);
+
           if (data.data.length > 0) {
-            setSelectedCompanyId(data.data[0].hrId); // Default select first
+            setSelectedCompanyId(data.data[0].hrId);
           }
         }
       } catch (err) {
@@ -24,18 +30,22 @@ const MyTeam = () => {
         setLoading(false);
       }
     };
+
     fetchCompanies();
-  }, []);
+  }, [axiosSecure]);
 
   // When company selected, fetch team
   useEffect(() => {
     const fetchTeam = async () => {
       if (!selectedCompanyId) return;
+
       try {
-        const res = await fetch(
-          `/api/employees/team-list?hrId=${selectedCompanyId}`
-        );
-        const data = await res.json();
+        const res = await axiosSecure.get(`/employees/team-list`, {
+          params: { hrId: selectedCompanyId },
+        });
+
+        const data = res.data;
+
         if (data.type === "team") {
           setTeamData(data.data);
         }
@@ -43,19 +53,15 @@ const MyTeam = () => {
         console.error(error);
       }
     };
+
     fetchTeam();
-  }, [selectedCompanyId]);
+  }, [selectedCompanyId, axiosSecure]);
 
   const handleCompanyChange = (e) => {
     setSelectedCompanyId(e.target.value);
   };
 
-  if (loading)
-    return (
-      <div className="text-center p-10">
-        <span className="loading loading-spinner"></span>
-      </div>
-    );
+  if (loading) return <Loading />;
 
   if (companies.length === 0) {
     return (

@@ -1,11 +1,11 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import Swal from "sweetalert2";
-import useAxiosBase from "../../hooks/useAxiosBase";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const AssetForm = () => {
   const navigate = useNavigate();
-  const axiosBase = useAxiosBase();
+  const axiosSecure = useAxiosSecure();
   const {
     register,
     handleSubmit,
@@ -22,9 +22,7 @@ const AssetForm = () => {
     };
 
     try {
-      const res = await axiosBase.post("/assets", formData, {
-        withCredentials: true, // important to send/receive cookies
-      });
+      const res = await axiosSecure.post("/assets", formData);
       console.log(res);
       if (res.status === 201) {
         Swal.fire({

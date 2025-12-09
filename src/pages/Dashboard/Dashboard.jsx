@@ -1,39 +1,42 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import useAxiosBase from "../../hooks/useAxiosBase";
+import useAuth from "../../hooks/useAuth";
+import useAxiosSecure from "../../hooks/useAxiosSecure"; // Import if needed for other calls
 
 import DashboardCharts from "../../components/DashboardCharts/DashboardCharts";
 import RequestList from "../../components/RequestList/RequestList";
 
 const Dashboard = () => {
-  const [user, setUser] = useState(null);
+  const { user, loading } = useAuth(); // getting user from context
   const navigate = useNavigate();
-  const axiosBase = useAxiosBase();
+  // const axiosSecure = useAxiosSecure(); 
+
+  // Redirect if not logged in (handled by PrivateRoute usually, but double check)
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await axiosBase.get("/users/me", {
-          withCredentials: true,
-        });
+    if (!loading && !user) {
+      navigate("/login");
+    }
+  }, [user, loading, navigate]);
 
-        setUser(res.data);
-      } catch (err) {
-        navigate("/login");
-      }
-    };
-
-    fetchUser();
-  }, [axiosBase, navigate]);
+  const { logout } = useAuth();
 
   const handleLogout = async () => {
     try {
-      await axiosBase.post("/users/logout", {}, { withCredentials: true });
-      setUser(null);
+      await logout();
       navigate("/login");
     } catch (err) {
       console.error(err);
     }
   };
+
+  if (loading)
+    return (
+      <div className="flex justify-center mt-20">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
+
+  if (!user) return null; // Should redirect
 
   if (!user)
     return (

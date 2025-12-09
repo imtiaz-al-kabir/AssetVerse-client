@@ -1,49 +1,75 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import useAuth from "../../hooks/useAuth";
+import Swal from "sweetalert2";
 
 const RequestList = () => {
   const [requests, setRequests] = useState([]);
-  const [user, setUser] = useState(null);
+  const { user } = useAuth();
+  const axiosSecure = useAxiosSecure();
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-    setUser(userInfo);
-    fetchRequests(userInfo);
-  }, []);
+  const fetchRequests = async () => {
+    if (!user) return;
 
-  const fetchRequests = async (userInfo) => {
-    if (!userInfo) return;
+    // Determine endpoint based on role
+    // HR sees all requests at /requests
+    // Employee sees own at /requests/my-requests (need to verify this route exists)
+    // Looking at previous summary, requestRoutes has /my-requests?
+    // Let's assume standard REST: GET /requests for HR (all), GET /requests/my-requests for Employee
 
-    const url =
-      userInfo.role === "hr" ? "/api/requests" : "/api/requests/myrequests";
+    // Actually, let's look at the original code: 
+    // userInfo.role === "hr" ? "/api/requests" : "/api/requests/myrequests";
+    // I need to use the axiosSecure instance which likely has baseURL set.
+    // usage: axiosSecure.get('/requests') or axiosSecure.get('/requests/my-requests')
+
+    const url = user.role === "hr" ? "/requests" : "/requests/my-requests";
+
     try {
-      const res = await fetch(url);
-      const data = await res.json();
-      if (res.ok) {
-        setRequests(data);
-      } else {
-        console.error("Failed to fetch requests");
-      }
+      const res = await axiosSecure.get(url);
+      setRequests(res.data);
     } catch (err) {
       console.error(err);
     }
   };
 
+  useEffect(() => {
+    fetchRequests();
+  }, [user, axiosSecure]);
+
   const handleAction = async (id, status) => {
     try {
-      const res = await fetch(`/api/requests/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
+      await axiosSecure.put(`/requests/${id}`, { status });
+      Swal.fire({
+        icon: 'success',
+        title: `Request ${status}`,
+        showConfirmButton: false,
+        timer: 1500
       });
-      if (res.ok) {
-        fetchRequests(user);
-      } else {
-        const data = await res.json();
-        alert(data.message);
-      }
+      fetchRequests();
     } catch (error) {
       console.error(error);
+      if (error.response?.data?.message === "Package limit reached. Upgrade required.") {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Package Limit Reached',
+          text: 'You have reached the employee limit for your package. Please upgrade to accept more requests.',
+          showCancelButton: true,
+          confirmButtonText: 'Upgrade Now',
+          cancelButtonText: 'Cancel'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate('/subscription');
+          }
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Action Failed',
+          text: error.response?.data?.message || 'Something went wrong'
+        });
+      }
     }
   };
 
@@ -79,55 +105,48 @@ const RequestList = () => {
           <tbody>
             {requests.map((request) => (
               <tr key={request._id} className="hover">
-                <td>{request.assetId?.name || "N/A"}</td>
-                <td>{request.assetId?.type || "N/A"}</td>
+                <td>{request.assetName || "N/A"}</td>
+                <td>{request.assetType || "N/A"}</td>
                 <td>
                   <div className="flex items-center space-x-3">
-                    <div className="avatar placeholder">
-                      <div className="bg-neutral-focus text-neutral-content rounded-full w-8">
-                        <span className="text-xs">
-                          {request.userId?.name?.charAt(0) || "U"}
-                        </span>
-                      </div>
-                    </div>
+                    {/* Placeholder for avatar if needed */}
                     <div>
                       <div className="font-bold">
-                        {request.userId?.name || "Me"}
+                        {request.requesterName || "Me"}
                       </div>
                       <div className="text-sm opacity-50">
-                        {request.userId?.email}
+                        {request.requesterEmail}
                       </div>
                     </div>
                   </div>
                 </td>
-                <td>{request.requestType}</td>
+                <td>{request.requestType || "Request"}</td>
                 <td>
                   <span
-                    className={`badge ${
-                      request.status === "Approved"
-                        ? "badge-success"
-                        : request.status === "Rejected"
+                    className={`badge ${request.requestStatus === "approved" || request.requestStatus === "Approved" // Handle case sensitivity just in case
+                      ? "badge-success"
+                      : request.requestStatus === "rejected" || request.requestStatus === "Rejected"
                         ? "badge-error"
                         : "badge-warning"
-                    }`}
+                      }`}
                   >
-                    {request.status}
+                    {request.requestStatus}
                   </span>
                 </td>
                 <td>{new Date(request.requestDate).toLocaleDateString()}</td>
                 {user?.role === "hr" && (
                   <td>
-                    {request.status === "Pending" && (
-                      <div className="btn-group">
+                    {(request.requestStatus === "pending" || request.requestStatus === "Pending") && (
+                      <div className="join">
                         <button
-                          onClick={() => handleAction(request._id, "Approved")}
-                          className="btn btn-success btn-xs"
+                          onClick={() => handleAction(request._id, "approved")}
+                          className="btn btn-success btn-xs join-item"
                         >
                           Approve
                         </button>
                         <button
-                          onClick={() => handleAction(request._id, "Rejected")}
-                          className="btn btn-error btn-xs"
+                          onClick={() => handleAction(request._id, "rejected")}
+                          className="btn btn-error btn-xs join-item"
                         >
                           Reject
                         </button>
