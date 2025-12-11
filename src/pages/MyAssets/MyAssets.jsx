@@ -73,8 +73,8 @@ const MyAssets = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      {/* Header */}
+    <div className="container mx-auto py-10">
+      
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">My Assets</h2>
         <button onClick={handlePrint} className="btn btn-outline">

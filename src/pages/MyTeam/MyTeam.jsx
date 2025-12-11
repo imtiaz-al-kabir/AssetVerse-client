@@ -3,18 +3,18 @@ import useAxiosSecure from "../../hooks/useAxiosSecure";
 import Loading from "../Loading/Loading";
 
 const MyTeam = () => {
-  const [teamData, setTeamData] = useState([]); // List of employees
+  const [teamData, setTeamData] = useState([]); 
   const [companies, setCompanies] = useState([]);
   const [selectedCompanyId, setSelectedCompanyId] = useState("");
   const [loading, setLoading] = useState(true);
   const axiosSecure = useAxiosSecure();
-  // Initial load: Get list of affiliated companies
+ 
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
         const res = await axiosSecure.get("/employees/team-list");
 
-        // axios returns data inside res.data
+        
         const data = res.data;
 
         if (data.type === "companies") {
@@ -34,7 +34,6 @@ const MyTeam = () => {
     fetchCompanies();
   }, [axiosSecure]);
 
-  // When company selected, fetch team
   useEffect(() => {
     const fetchTeam = async () => {
       if (!selectedCompanyId) return;
@@ -76,7 +75,7 @@ const MyTeam = () => {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto py-10">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">My Team</h2>
         {companies.length > 1 && (
@@ -115,7 +114,7 @@ const MyTeam = () => {
               </div>
               <h3 className="font-bold text-lg">{member.employeeName}</h3>
               <p className="text-sm text-gray-500">{member.employeeEmail}</p>
-              {/* <div className="badge badge-ghost mt-2">Developer</div> */}
+             
             </div>
           </div>
         ))}

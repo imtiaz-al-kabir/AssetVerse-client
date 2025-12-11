@@ -64,13 +64,13 @@ const RequestAsset = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto py-10">
       <h2 className="text-2xl font-bold mb-6">Request an Asset</h2>
 
       <div className="mb-6">
         <input
           type="text"
-          placeholder="Search for laptops, chairs, etc..."
+          placeholder="Search your assets..."
           className="input input-bordered w-full focus-within:outline-0"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -78,7 +78,7 @@ const RequestAsset = () => {
       </div>
 
       {loading ? (
-        <span className="loading loading-spinner text-center"></span>
+        <loading />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {assets.map((asset) => (
