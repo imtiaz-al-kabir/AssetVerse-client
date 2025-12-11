@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { motion } from "motion/react";
+import { FaSearch, FaFilter, FaPlus, FaTrash, FaBox } from "react-icons/fa";
 import Swal from "sweetalert2";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 
@@ -55,105 +57,167 @@ const AssetList = () => {
     });
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <span className="loading loading-spinner loading-lg text-primary"></span>
+      </div>
+    );
+  }
+
   return (
-    <div className="container mx-auto py-10">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Asset Inventory</h2>
-        <button
-          onClick={() => navigate("/assets/add")}
-          className="btn btn-primary"
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-base-100 to-secondary/5 py-12 px-4">
+      <div className="container mx-auto max-w-7xl">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
         >
-          Add New Asset
-        </button>
-      </div>
+          {/* Header */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+            <div>
+              <h2 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">
+                Asset Inventory
+              </h2>
+              <p className="text-base-content/70">Manage your company's assets</p>
+            </div>
+            <button
+              onClick={() => navigate("/assets/add")}
+              className="btn btn-primary shadow-lg hover:shadow-xl hover:scale-105 transition-all gap-2"
+            >
+              <FaPlus />
+              Add New Asset
+            </button>
+          </div>
 
-      {/* Search and Filter */}
-      <div className="flex gap-4 mb-6">
-        <input
-          type="text"
-          placeholder="Search assets..."
-          className="input input-bordered w-full max-w-xs focus-within:outline-0"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+          {/* Search and Filter */}
+          <div className="bg-base-100 rounded-2xl shadow-xl border border-base-300 p-6 mb-6">
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-semibold flex items-center gap-2">
+                    <FaSearch className="text-primary" />
+                    Search Assets
+                  </span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Search by name..."
+                  className="input input-bordered focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
 
-        <select
-          className="select select-bordered w-full max-w-xs focus-within:outline-0"
-          value={filterType}
-          onChange={(e) => setFilterType(e.target.value)}
-        >
-          <option value="">All Types</option>
-          <option value="Returnable">Returnable</option>
-          <option value="Non-returnable">Non-returnable</option>
-        </select>
-      </div>
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-semibold flex items-center gap-2">
+                    <FaFilter className="text-primary" />
+                    Filter by Type
+                  </span>
+                </label>
+                <select
+                  className="select select-bordered focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value)}
+                >
+                  <option value="">All Types</option>
+                  <option value="Returnable">Returnable</option>
+                  <option value="Non-returnable">Non-returnable</option>
+                </select>
+              </div>
+            </div>
+          </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="table w-full">
-          <thead>
-            <tr>
-              <th>Image</th>
-              <th>Name</th>
-              <th>Type</th>
-              <th>Quantity</th>
-              <th>Date Added</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
+          {/* Table Card */}
+          <div className="bg-base-100 rounded-2xl shadow-xl border border-base-300 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="table w-full">
+                <thead className="bg-gradient-to-r from-primary/10 to-secondary/10">
+                  <tr>
+                    <th className="text-base">Image</th>
+                    <th className="text-base">Name</th>
+                    <th className="text-base">Type</th>
+                    <th className="text-base">Quantity</th>
+                    <th className="text-base">Date Added</th>
+                    <th className="text-base">Actions</th>
+                  </tr>
+                </thead>
 
-          <tbody>
-            {assets.map((asset) => (
-              <tr key={asset._id}>
-                <td>
-                  <div className="avatar">
-                    <div className="mask mask-squircle w-12 h-12">
-                      <img src={asset.productImage} alt={asset.productName} />
-                    </div>
-                  </div>
-                </td>
+                <tbody>
+                  {assets.map((asset, index) => (
+                    <motion.tr
+                      key={asset._id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      className="hover:bg-base-200 transition-colors"
+                    >
+                      <td>
+                        <div className="avatar">
+                          <div className="mask mask-squircle w-14 h-14 ring ring-primary ring-offset-2 ring-offset-base-100">
+                            <img src={asset.productImage} alt={asset.productName} />
+                          </div>
+                        </div>
+                      </td>
 
-                <td className="font-bold">{asset.productName}</td>
+                      <td className="font-bold text-base">{asset.productName}</td>
 
-                <td>
-                  <div
-                    className={`badge ${
-                      asset.productType === "Returnable"
-                        ? "badge-warning"
-                        : "badge-ghost"
-                    }`}
-                  >
-                    {asset.productType}
-                  </div>
-                </td>
+                      <td>
+                        <div
+                          className={`badge badge-lg ${asset.productType === "Returnable"
+                              ? "badge-warning"
+                              : "badge-info"
+                            }`}
+                        >
+                          {asset.productType}
+                        </div>
+                      </td>
 
-                <td>
-                  {asset.availableQuantity} / {asset.productQuantity}
-                </td>
+                      <td>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-primary">{asset.availableQuantity}</span>
+                          <span className="text-base-content/60">/ {asset.productQuantity}</span>
+                        </div>
+                      </td>
 
-                <td>{new Date(asset.dateAdded).toLocaleDateString()}</td>
+                      <td className="text-base-content/70">
+                        {new Date(asset.dateAdded).toLocaleDateString()}
+                      </td>
 
-                <td>
-                  <button
-                    onClick={() => handleDelete(asset._id)}
-                    className="btn btn-sm btn-error"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
+                      <td>
+                        <button
+                          onClick={() => handleDelete(asset._id)}
+                          className="btn btn-error btn-sm gap-2 hover:scale-105 transition-transform"
+                        >
+                          <FaTrash />
+                          Delete
+                        </button>
+                      </td>
+                    </motion.tr>
+                  ))}
 
-            {assets.length === 0 && (
-              <tr>
-                <td colSpan="6" className="text-center">
-                  No assets found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+                  {assets.length === 0 && (
+                    <tr>
+                      <td colSpan="6" className="text-center py-12">
+                        <div className="flex flex-col items-center gap-4">
+                          <FaBox className="text-6xl text-base-content/20" />
+                          <p className="text-lg text-base-content/60">No assets found</p>
+                          <button
+                            onClick={() => navigate("/assets/add")}
+                            className="btn btn-primary btn-sm"
+                          >
+                            Add Your First Asset
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </div>
   );

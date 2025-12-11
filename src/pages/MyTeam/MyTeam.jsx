@@ -1,25 +1,24 @@
 import { useEffect, useState } from "react";
+import { motion } from "motion/react";
+import { FaUsers, FaBuilding, FaEnvelope, FaUserCircle } from "react-icons/fa";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import Loading from "../Loading/Loading";
 
 const MyTeam = () => {
-  const [teamData, setTeamData] = useState([]); 
+  const [teamData, setTeamData] = useState([]);
   const [companies, setCompanies] = useState([]);
   const [selectedCompanyId, setSelectedCompanyId] = useState("");
   const [loading, setLoading] = useState(true);
   const axiosSecure = useAxiosSecure();
- 
+
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
         const res = await axiosSecure.get("/employees/team-list");
-
-        
         const data = res.data;
 
         if (data.type === "companies") {
           setCompanies(data.data);
-
           if (data.data.length > 0) {
             setSelectedCompanyId(data.data[0].hrId);
           }
@@ -44,7 +43,6 @@ const MyTeam = () => {
         });
 
         const data = res.data;
-
         if (data.type === "team") {
           setTeamData(data.data);
         }
@@ -64,60 +62,129 @@ const MyTeam = () => {
 
   if (companies.length === 0) {
     return (
-      <div className="text-center p-10">
-        <h2 className="text-2xl font-bold">My Team</h2>
-        <p className="mt-4 text-gray-500">
-          You are not affiliated with any company yet.
-        </p>
-        <p>Request an asset to join a team!</p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-info/5 via-base-100 to-accent/5">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center p-12 bg-base-100 rounded-3xl shadow-2xl border border-base-300 max-w-md"
+        >
+          <FaUsers className="text-6xl text-base-content/20 mx-auto mb-6" />
+          <h2 className="text-3xl font-bold mb-4">No Team Yet</h2>
+          <p className="text-base-content/70 mb-6">
+            You are not affiliated with any company yet. Request an asset to join a team!
+          </p>
+          <button
+            onClick={() => window.location.href = "/request-asset"}
+            className="btn btn-primary"
+          >
+            Request Asset
+          </button>
+        </motion.div>
       </div>
     );
   }
 
-  return (
-    <div className="container mx-auto py-10">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">My Team</h2>
-        {companies.length > 1 && (
-          <select
-            className="select select-bordered"
-            value={selectedCompanyId}
-            onChange={handleCompanyChange}
-          >
-            {companies.map((c) => (
-              <option key={c.hrId} value={c.hrId}>
-                {c.companyName}
-              </option>
-            ))}
-          </select>
-        )}
-      </div>
-      {companies.length === 1 && (
-        <p className="mb-4 text-lg">
-          Company: <span className="font-bold">{companies[0].companyName}</span>
-        </p>
-      )}
+  const selectedCompany = companies.find(c => c.hrId === selectedCompanyId);
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {teamData.map((member) => (
-          <div
-            key={member._id}
-            className="card bg-base-100 shadow-md border hover:shadow-xl transition-all"
-          >
-            <div className="card-body items-center text-center">
-              <div className="avatar placeholder mb-2">
-                <div className="bg-neutral-focus text-neutral-content rounded-full w-12">
-                  <span className="text-xl">
-                    {member.employeeName.charAt(0)}
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-info/5 via-base-100 to-accent/5 py-12 px-4">
+      <div className="container mx-auto max-w-7xl">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          {/* Header */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+            <div>
+              <h2 className="text-4xl font-bold bg-gradient-to-r from-info to-accent bg-clip-text text-transparent mb-2">
+                My Team
+              </h2>
+              <p className="text-base-content/70">Connect with your colleagues</p>
+            </div>
+
+            {companies.length > 1 && (
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-semibold flex items-center gap-2">
+                    <FaBuilding className="text-info" />
+                    Select Company
                   </span>
+                </label>
+                <select
+                  className="select select-bordered focus:outline-none focus:ring-2 focus:ring-info transition-all"
+                  value={selectedCompanyId}
+                  onChange={handleCompanyChange}
+                >
+                  {companies.map((c) => (
+                    <option key={c.hrId} value={c.hrId}>
+                      {c.companyName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+
+          {/* Company Info Card */}
+          {selectedCompany && (
+            <div className="bg-gradient-to-r from-info/10 to-accent/10 rounded-2xl p-6 mb-8 border border-info/20">
+              <div className="flex items-center gap-3">
+                <FaBuilding className="text-3xl text-info" />
+                <div>
+                  <h3 className="text-xl font-bold">{selectedCompany.companyName}</h3>
+                  <p className="text-sm text-base-content/60">{teamData.length} team members</p>
                 </div>
               </div>
-              <h3 className="font-bold text-lg">{member.employeeName}</h3>
-              <p className="text-sm text-gray-500">{member.employeeEmail}</p>
-             
             </div>
+          )}
+
+          {/* Team Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {teamData.map((member, index) => (
+              <motion.div
+                key={member._id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                whileHover={{ y: -8 }}
+                className="group"
+              >
+                <div className="bg-base-100 rounded-2xl shadow-lg border border-base-300 hover:border-info/50 transition-all duration-300 overflow-hidden">
+                  {/* Gradient Header */}
+                  <div className="bg-gradient-to-r from-info to-accent p-6 text-white text-center relative overflow-hidden">
+                    <div className="absolute inset-0 bg-white/10 group-hover:bg-white/20 transition-colors"></div>
+                    <div className="relative">
+                      <div className="avatar placeholder mb-3">
+                        <div className="bg-white/20 backdrop-blur-sm text-white rounded-full w-20 h-20 ring ring-white ring-offset-2 ring-offset-transparent group-hover:scale-110 transition-transform">
+                          <span className="text-3xl font-bold">
+                            {member.employeeName.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-6 text-center">
+                    <h3 className="font-bold text-lg mb-2">{member.employeeName}</h3>
+                    <div className="flex items-center justify-center gap-2 text-sm text-base-content/60">
+                      <FaEnvelope className="text-info" />
+                      <p className="truncate">{member.employeeEmail}</p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
           </div>
-        ))}
+
+          {teamData.length === 0 && (
+            <div className="text-center py-12">
+              <FaUserCircle className="text-6xl text-base-content/20 mx-auto mb-4" />
+              <p className="text-lg text-base-content/60">No team members found</p>
+            </div>
+          )}
+        </motion.div>
       </div>
     </div>
   );

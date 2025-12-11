@@ -1,5 +1,7 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
+import { motion } from "motion/react";
+import { FaUser, FaEnvelope, FaLock, FaCalendar, FaUserPlus } from "react-icons/fa";
 import useAuth from "../../../hooks/useAuth";
 import Swal from "sweetalert2";
 
@@ -26,6 +28,7 @@ const RegisterEmployee = () => {
       Swal.fire({
         icon: "success",
         title: "Registration Successful",
+        text: "Welcome to AssetVerse!",
         showConfirmButton: false,
         timer: 1500,
       });
@@ -41,84 +44,144 @@ const RegisterEmployee = () => {
   };
 
   return (
-    <div className="flex justify-center items-center py-10 lg:pt-30">
-      <div className="card w-96 bg-base-100 shadow-xl">
-        <div className="card-body">
-          <h2 className="card-title justify-center text-2xl mb-4">
-            Join as Employee
-          </h2>
-          <form onSubmit={handleSubmit(handleEmployee)}>
-            <div className="form-control w-full">
-              <label className="label">
-                <span className="label-text">Full Name</span>
-              </label>
-              <input
-                type="text"
-                {...register("name", { required: true })}
-                className="input input-bordered w-full"
-              />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-secondary/10 via-base-100 to-accent/10 relative overflow-hidden py-12 px-4">
+      {/* Animated background */}
+      <div className="absolute inset-0">
+        <div className="absolute top-20 right-20 w-72 h-72 bg-secondary/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 left-20 w-72 h-72 bg-accent/20 rounded-full blur-3xl animate-pulse delay-700"></div>
+      </div>
 
-              {errors.name && (
-                <p className="text-red-500">{errors.name.message}</p>
-              )}
-            </div>
-            <div className="form-control w-full mt-2">
-              <label className="label">
-                <span className="label-text">Email</span>
-              </label>
-              <input
-                type="email"
-                {...register("email", { required: true })}
-                className="input input-bordered w-full"
-              />
-              {errors.email && (
-                <p className="text-red-500">{errors.email.message}</p>
-              )}
-            </div>
-            <div className="form-control w-full mt-2">
-              <label className="label">
-                <span className="label-text">Password</span>
-              </label>
-              <input
-                type="password"
-                {...register("password", {
-                  required: "Password is required",
-                  minLength: {
-                    value: 6,
-                    message: "Minimum 6 characters required",
-                  },
-                  pattern: {
-                    value: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\W).+$/,
-                    message:
-                      "Password must include uppercase, lowercase & special character",
-                  },
-                })}
-                className="input input-bordered w-full"
-              />
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="relative w-full max-w-md"
+      >
+        <div className="bg-base-100 rounded-3xl shadow-2xl border border-base-300 overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-secondary to-accent p-8 text-white text-center">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2, type: "spring" }}
+              className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <FaUserPlus className="text-4xl" />
+            </motion.div>
+            <h2 className="text-3xl font-bold">Join as Employee</h2>
+            <p className="text-white/80 mt-2">Start managing your assets today</p>
+          </div>
 
-              {errors.password && (
-                <p className="text-red-500">{errors.password.message}</p>
-              )}
-            </div>
-            <div className="form-control w-full mt-2">
-              <label className="label">
-                <span className="label-text">Date of Birth</span>
-              </label>
-              <input
-                type="date"
-                {...register("dateOfBirth")}
-                className="input input-bordered w-full"
-              />
-            </div>
+          {/* Form */}
+          <div className="p-8">
+            <form onSubmit={handleSubmit(handleEmployee)} className="space-y-6">
+              {/* Full Name */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-semibold flex items-center gap-2">
+                    <FaUser className="text-secondary" />
+                    Full Name
+                  </span>
+                </label>
+                <input
+                  type="text"
+                  {...register("name", { required: "Name is required" })}
+                  className="input input-bordered focus:outline-none focus:ring-2 focus:ring-secondary transition-all"
+                  placeholder="John Doe"
+                />
+                {errors.name && (
+                  <p className="text-error text-sm mt-1">{errors.name.message}</p>
+                )}
+              </div>
 
-            <div className="card-actions justify-center mt-6">
-              <button type="submit" className="btn btn-secondary w-full">
+              {/* Email */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-semibold flex items-center gap-2">
+                    <FaEnvelope className="text-secondary" />
+                    Email Address
+                  </span>
+                </label>
+                <input
+                  type="email"
+                  {...register("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: "Invalid email address"
+                    }
+                  })}
+                  className="input input-bordered focus:outline-none focus:ring-2 focus:ring-secondary transition-all"
+                  placeholder="john@example.com"
+                />
+                {errors.email && (
+                  <p className="text-error text-sm mt-1">{errors.email.message}</p>
+                )}
+              </div>
+
+              {/* Password */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-semibold flex items-center gap-2">
+                    <FaLock className="text-secondary" />
+                    Password
+                  </span>
+                </label>
+                <input
+                  type="password"
+                  {...register("password", {
+                    required: "Password is required",
+                    minLength: {
+                      value: 6,
+                      message: "Minimum 6 characters required",
+                    },
+                    pattern: {
+                      value: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\W).+$/,
+                      message: "Must include uppercase, lowercase & special character",
+                    },
+                  })}
+                  className="input input-bordered focus:outline-none focus:ring-2 focus:ring-secondary transition-all"
+                  placeholder="••••••••"
+                />
+                {errors.password && (
+                  <p className="text-error text-sm mt-1">{errors.password.message}</p>
+                )}
+              </div>
+
+              {/* Date of Birth */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-semibold flex items-center gap-2">
+                    <FaCalendar className="text-secondary" />
+                    Date of Birth
+                  </span>
+                </label>
+                <input
+                  type="date"
+                  {...register("dateOfBirth")}
+                  className="input input-bordered focus:outline-none focus:ring-2 focus:ring-secondary transition-all"
+                />
+              </div>
+
+              {/* Submit */}
+              <button
+                type="submit"
+                className="btn btn-secondary w-full shadow-lg hover:shadow-xl hover:scale-105 transition-all text-lg"
+              >
                 Join AssetVerse
               </button>
-            </div>
-          </form>
+            </form>
+
+            {/* Login Link */}
+            <p className="text-center mt-6 text-sm text-base-content/70">
+              Already have an account?{" "}
+              <a href="/login" className="text-secondary font-semibold hover:underline">
+                Login here
+              </a>
+            </p>
+          </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

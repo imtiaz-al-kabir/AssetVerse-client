@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
+import { motion } from "motion/react";
+import { FaClipboardList, FaCheckCircle, FaTimesCircle, FaClock } from "react-icons/fa";
 import Swal from "sweetalert2";
 import useAuth from "../../hooks/useAuth";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
@@ -42,7 +44,8 @@ const RequestList = () => {
       await axiosSecure.put(`/requests/${id}`, { status });
       Swal.fire({
         icon: "success",
-        title: `Request ${status}`,
+        title: `Request ${status}!`,
+        text: `The request has been ${status.toLowerCase()}`,
         showConfirmButton: false,
         timer: 1500,
       });
@@ -75,137 +78,179 @@ const RequestList = () => {
     }
   };
 
+  const getStatusBadge = (status) => {
+    const statusLower = status?.toLowerCase();
+    if (statusLower === "approved") {
+      return <span className="badge badge-success gap-2"><FaCheckCircle /> Approved</span>;
+    } else if (statusLower === "rejected") {
+      return <span className="badge badge-error gap-2"><FaTimesCircle /> Rejected</span>;
+    } else {
+      return <span className="badge badge-warning gap-2"><FaClock /> Pending</span>;
+    }
+  };
+
   return (
-    <div
-      className={
-        user?.role === "hr" ? "container mx-auto pb-10 px-4 mt-8" : "w-full"
-      }
-    >
-      <div className="flex justify-between items-center mb-4">
-        {user?.role === "hr" && (
-          <h2 className="text-2xl font-bold">All Requests</h2>
-        )}
-        {user?.role === "employee" && <div />}
-        {user?.role === "employee" && (
-          <Link to="/requests/new" className="hidden">
-            Make Request
-          </Link>
-        )}
-      </div>
+    <div className={user?.role === "hr" ? "min-h-screen bg-gradient-to-br from-accent/5 via-base-100 to-info/5 py-12 px-4" : "w-full"}>
+      <div className={user?.role === "hr" ? "container mx-auto max-w-7xl" : ""}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          {/* Header */}
+          {user?.role === "hr" && (
+            <div className="mb-8">
+              <h2 className="text-4xl font-bold bg-gradient-to-r from-accent to-info bg-clip-text text-transparent mb-2">
+                All Requests
+              </h2>
+              <p className="text-base-content/70">Manage employee asset requests</p>
+            </div>
+          )}
 
-      <div className="overflow-x-auto">
-        <table className="table w-full">
-          <thead>
-            <tr>
-              <th>Asset</th>
-              <th>Type</th>
-              <th>User</th>
-              <th>Request Type</th>
-              <th>Status</th>
-              <th>Date</th>
-              {user?.role === "hr" && <th>Actions</th>}
-            </tr>
-          </thead>
+          {/* Table Card */}
+          <div className="bg-base-100 rounded-2xl shadow-xl border border-base-300 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="table w-full">
+                <thead className="bg-gradient-to-r from-accent/10 to-info/10">
+                  <tr>
+                    <th className="text-base">Asset</th>
+                    <th className="text-base">Type</th>
+                    <th className="text-base">User</th>
+                    <th className="text-base">Request Type</th>
+                    <th className="text-base">Status</th>
+                    <th className="text-base">Date</th>
+                    {user?.role === "hr" && <th className="text-base">Actions</th>}
+                  </tr>
+                </thead>
 
-          <tbody>
-            {requests.map((request) => (
-              <tr key={request._id} className="hover">
-                <td>{request.assetName || "N/A"}</td>
-                <td>{request.assetType || "N/A"}</td>
-                <td>
-                  <div className="flex items-center space-x-3">
-                    <div>
-                      <div className="font-bold">
-                        {request.requesterName || "Me"}
-                      </div>
-                      <div className="text-sm opacity-50">
-                        {request.requesterEmail}
-                      </div>
-                    </div>
-                  </div>
-                </td>
+                <tbody>
+                  {requests.map((request, index) => (
+                    <motion.tr
+                      key={request._id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      className="hover:bg-base-200 transition-colors"
+                    >
+                      <td className="font-semibold">{request.assetName || "N/A"}</td>
+                      <td>
+                        <span className="badge badge-outline">{request.assetType || "N/A"}</span>
+                      </td>
+                      <td>
+                        <div className="flex items-center gap-3">
+                          <div className="avatar placeholder">
+                            <div className="bg-primary text-primary-content rounded-full w-10">
+                              <span className="text-xs">
+                                {(request.requesterName || "Me").charAt(0).toUpperCase()}
+                              </span>
+                            </div>
+                          </div>
+                          <div>
+                            <div className="font-bold">{request.requesterName || "Me"}</div>
+                            <div className="text-sm text-base-content/60">
+                              {request.requesterEmail}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
 
-                <td>{request.requestType || "Request"}</td>
+                      <td>
+                        <span className="badge badge-ghost">{request.requestType || "Request"}</span>
+                      </td>
 
-                <td>
-                  <span
-                    className={`badge ${
-                      request.requestStatus?.toLowerCase() === "approved"
-                        ? "badge-success"
-                        : request.requestStatus?.toLowerCase() === "rejected"
-                        ? "badge-error"
-                        : "badge-warning"
-                    }`}
+                      <td>{getStatusBadge(request.requestStatus)}</td>
+
+                      <td className="text-base-content/70">
+                        {new Date(request.requestDate).toLocaleDateString()}
+                      </td>
+
+                      {user?.role === "hr" && (
+                        <td>
+                          {request.requestStatus?.toLowerCase() === "pending" && (
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleAction(request._id, "approved")}
+                                className="btn btn-success btn-xs gap-1 hover:scale-105 transition-transform"
+                              >
+                                <FaCheckCircle />
+                                Approve
+                              </button>
+                              <button
+                                onClick={() => handleAction(request._id, "rejected")}
+                                className="btn btn-error btn-xs gap-1 hover:scale-105 transition-transform"
+                              >
+                                <FaTimesCircle />
+                                Reject
+                              </button>
+                            </div>
+                          )}
+                          {request.requestStatus?.toLowerCase() !== "pending" && (
+                            <span className="text-sm text-base-content/50">No actions</span>
+                          )}
+                        </td>
+                      )}
+                    </motion.tr>
+                  ))}
+
+                  {requests.length === 0 && (
+                    <tr>
+                      <td colSpan={user?.role === "hr" ? "7" : "6"} className="text-center py-12">
+                        <div className="flex flex-col items-center gap-4">
+                          <FaClipboardList className="text-6xl text-base-content/20" />
+                          <p className="text-lg text-base-content/60">No requests found</p>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-center p-6 border-t border-base-300">
+                <div className="join">
+                  <button
+                    className="join-item btn btn-sm"
+                    disabled={page === 1}
+                    onClick={() => setPage(page - 1)}
                   >
-                    {request.requestStatus}
-                  </span>
-                </td>
-
-                <td>{new Date(request.requestDate).toLocaleDateString()}</td>
-
-                {user?.role === "hr" && (
-                  <td>
-                    {request.requestStatus?.toLowerCase() === "pending" && (
-                      <div className="join">
-                        <button
-                          onClick={() => handleAction(request._id, "approved")}
-                          className="btn btn-success btn-xs join-item"
-                        >
-                          Approve
-                        </button>
-                        <button
-                          onClick={() => handleAction(request._id, "rejected")}
-                          className="btn btn-error btn-xs join-item"
-                        >
-                          Reject
-                        </button>
-                      </div>
-                    )}
-                  </td>
-                )}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {requests.length === 0 && (
-          <p className="text-center py-4 opacity-70">No requests found.</p>
-        )}
-
-        <div className="flex justify-center mt-6 gap-4 items-center">
-          {/* Previous */}
-          <button
-            className="btn btn-outline btn-sm"
-            disabled={page === 1}
-            onClick={() => setPage(page - 1)}
-          >
-            Previous
-          </button>
-
-          {/* Page numbers */}
-          <div className="join">
-            {Array.from({ length: totalPages }, (_, i) => (
-              <button
-                key={i + 1}
-                onClick={() => setPage(i + 1)}
-                className={`join-item btn btn-sm ${
-                  page === i + 1 ? "btn-active" : ""
-                }`}
-              >
-                {i + 1}
-              </button>
-            ))}
+                    «
+                  </button>
+                  {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (page <= 3) {
+                      pageNum = i + 1;
+                    } else if (page >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = page - 2 + i;
+                    }
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => setPage(pageNum)}
+                        className={`join-item btn btn-sm ${page === pageNum ? "btn-active btn-primary" : ""
+                          }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                  <button
+                    className="join-item btn btn-sm"
+                    disabled={page === totalPages}
+                    onClick={() => setPage(page + 1)}
+                  >
+                    »
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
-
-          {/* Next */}
-          <button
-            className="btn btn-outline btn-sm"
-            disabled={page === totalPages}
-            onClick={() => setPage(page + 1)}
-          >
-            Next
-          </button>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

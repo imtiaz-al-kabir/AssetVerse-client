@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { motion } from "motion/react";
+import { FaUser, FaEnvelope, FaBuilding, FaSave } from "react-icons/fa";
 import ImageUpload from "../../components/ImageUpload/ImageUpload";
 import useAuth from "../../hooks/useAuth";
 import Swal from "sweetalert2";
@@ -7,7 +9,7 @@ const Profile = () => {
   const { user, updateUser } = useAuth();
   const [name, setName] = useState("");
   const [profileImage, setProfileImage] = useState("");
-  const [companyLogo, setCompanyLogo] = useState(""); // Only for HR
+  const [companyLogo, setCompanyLogo] = useState("");
 
   useEffect(() => {
     if (user) {
@@ -29,7 +31,8 @@ const Profile = () => {
 
       Swal.fire({
         icon: 'success',
-        title: 'Profile Updated',
+        title: 'Profile Updated!',
+        text: 'Your changes have been saved successfully',
         showConfirmButton: false,
         timer: 1500
       });
@@ -44,79 +47,139 @@ const Profile = () => {
     }
   };
 
-  if (!user) return <div className="flex justify-center p-10"><span className="loading loading-spinner loading-lg"></span></div>;
+  if (!user) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <span className="loading loading-spinner loading-lg text-primary"></span>
+      </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto p-4 max-w-lg">
-      <div className="card bg-base-100 shadow-xl">
-        <div className="card-body">
-          <h2 className="card-title justify-center text-2xl mb-4">
-            My Profile
-          </h2>
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-base-100 to-secondary/5 py-12 px-4">
+      <div className="container mx-auto max-w-4xl">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          {/* Header Card */}
+          <div className="bg-base-100 rounded-3xl shadow-2xl border border-base-300 overflow-hidden mb-6">
+            <div className="bg-gradient-to-r from-primary to-secondary p-8 text-white relative overflow-hidden">
+              {/* Decorative elements */}
+              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
 
-          <div className="flex justify-center mb-6">
-            <div className="avatar">
-              <div className="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                <img
-                  src={
-                    profileImage || "https://ui-avatars.com/api/?name=" + name
-                  }
-                  alt="Profile"
-                />
+              <div className="relative flex flex-col md:flex-row items-center gap-6">
+                {/* Avatar */}
+                <div className="avatar">
+                  <div className="w-32 h-32 rounded-full ring ring-white ring-offset-4 ring-offset-transparent shadow-2xl">
+                    <img
+                      src={
+                        profileImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&size=128&background=6366f1&color=fff`
+                      }
+                      alt={user.name}
+                    />
+                  </div>
+                </div>
+
+                {/* User Info */}
+                <div className="text-center md:text-left">
+                  <h1 className="text-4xl font-bold mb-2">{user.name}</h1>
+                  <p className="text-white/80 text-lg mb-3">{user.email}</p>
+                  <div className="flex flex-wrap gap-2 justify-center md:justify-start">
+                    <span className="badge badge-lg bg-white/20 border-white/40 text-white">
+                      {user.role === "hr" ? "HR Manager" : "Employee"}
+                    </span>
+                    {user.companyName && (
+                      <span className="badge badge-lg bg-white/20 border-white/40 text-white">
+                        {user.companyName}
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          <form onSubmit={handleUpdate}>
-            <div className="form-control w-full">
-              <label className="label">
-                <span className="label-text">Full Name</span>
-              </label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="input input-bordered w-full focus-within:outline-0"
-              />
-            </div>
+          {/* Edit Form Card */}
+          <div className="bg-base-100 rounded-3xl shadow-2xl border border-base-300 overflow-hidden">
+            <div className="p-8">
+              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                <FaUser className="text-primary" />
+                Edit Profile
+              </h2>
 
-            <div className="form-control w-full mt-2">
-              <label className="label">
-                <span className="label-text">Email (Read Only)</span>
-              </label>
-              <input
-                type="text"
-                value={user.email}
-                disabled
-                className="input input-bordered w-full"
-              />
-            </div>
+              <form onSubmit={handleUpdate} className="space-y-6">
+                {/* Name */}
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold flex items-center gap-2">
+                      <FaUser className="text-primary" />
+                      Full Name
+                    </span>
+                  </label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="input input-bordered focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+                    placeholder="Your name"
+                  />
+                </div>
 
-            <div className="form-control w-full mt-2">
-              <ImageUpload
-                label="Profile Image"
-                defaultUrl={profileImage}
-                onUpload={(url) => setProfileImage(url)}
-              />
-            </div>
+                {/* Email (Read Only) */}
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold flex items-center gap-2">
+                      <FaEnvelope className="text-primary" />
+                      Email Address
+                    </span>
+                  </label>
+                  <input
+                    type="text"
+                    value={user.email}
+                    disabled
+                    className="input input-bordered bg-base-200 cursor-not-allowed"
+                  />
+                  <label className="label">
+                    <span className="label-text-alt text-base-content/60">Email cannot be changed</span>
+                  </label>
+                </div>
 
-            {user.role === "hr" && (
-              <div className="form-control w-full mt-2">
-                <ImageUpload
-                  label="Company Logo"
-                  defaultUrl={companyLogo}
-                  onUpload={(url) => setCompanyLogo(url)}
-                />
-              </div>
-            )}
+                {/* Profile Image */}
+                <div>
+                  <ImageUpload
+                    label="Profile Image"
+                    defaultUrl={profileImage}
+                    onUpload={(url) => setProfileImage(url)}
+                  />
+                </div>
 
-            <div className="card-actions justify-center mt-6">
-              <button type="submit" className="btn btn-primary w-full">
-                Update Profile
-              </button>
+                {/* Company Logo (HR Only) */}
+                {user.role === "hr" && (
+                  <div>
+                    <ImageUpload
+                      label="Company Logo"
+                      defaultUrl={companyLogo}
+                      onUpload={(url) => setCompanyLogo(url)}
+                    />
+                  </div>
+                )}
+
+                {/* Submit Button */}
+                <div className="pt-4">
+                  <button
+                    type="submit"
+                    className="btn btn-primary w-full shadow-lg hover:shadow-xl hover:scale-105 transition-all text-lg"
+                  >
+                    <FaSave className="mr-2" />
+                    Save Changes
+                  </button>
+                </div>
+              </form>
             </div>
-          </form>
-        </div>
+          </div>
+        </motion.div>
       </div>
     </div>
   );
