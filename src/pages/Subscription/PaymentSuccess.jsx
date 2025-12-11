@@ -2,11 +2,13 @@ import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import Swal from "sweetalert2";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
+import useAuth from "../../hooks/useAuth";
 
 const PaymentSuccess = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const axiosSecure = useAxiosSecure();
+    const { checkUser } = useAuth();
     const sessionId = searchParams.get("session_id");
 
     useEffect(() => {
@@ -22,6 +24,7 @@ const PaymentSuccess = () => {
                             showConfirmButton: false,
                             timer: 2000,
                         });
+                        checkUser();
                         navigate("/dashboard");
                     } else {
                         Swal.fire({

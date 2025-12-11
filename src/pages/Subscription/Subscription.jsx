@@ -37,6 +37,11 @@ const Subscription = () => {
     return (
         <div className="container mx-auto py-10 px-4">
             <h2 className="text-3xl font-bold text-center mb-10">Upgrade Your Plan</h2>
+            <div className="text-center mb-8">
+                <span className="text-lg font-semibold bg-base-200 px-4 py-2 rounded-full">
+                    Current Plan: <span className="text-primary uppercase">{user?.subscription || "Free"}</span>
+                </span>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {packages.map((pkg) => (
@@ -48,9 +53,9 @@ const Subscription = () => {
                             <button
                                 className="btn btn-primary"
                                 onClick={() => handleSubscribe(pkg)}
-                                disabled={loading}
+                                disabled={loading || user.subscription === pkg.name.toLowerCase()}
                             >
-                                {loading ? "Processing..." : `Select ${pkg.name}`}
+                                {loading ? "Processing..." : user.subscription === pkg.name.toLowerCase() ? "Current Plan" : `Upgrade to ${pkg.name}`}
                             </button>
                         </div>
                     </div>

@@ -1,11 +1,18 @@
 import { motion } from "motion/react";
 
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import useAxiosBase from "../../../hooks/useAxiosBase";
+import useAuth from "../../../hooks/useAuth";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 
 const Packages = () => {
   const [packages, setPackages] = useState([]);
+  const [loading, setLoading] = useState(false);
   const axiosBase = useAxiosBase();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const axiosSecure = useAxiosSecure();
 
   useEffect(() => {
     const fetchPackages = async () => {
@@ -40,6 +47,33 @@ const Packages = () => {
     return colors[index % colors.length];
   }
 
+  const handlePackageClick = async (pkg) => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await axiosSecure.post("/payments/create-checkout-session", {
+        packageName: pkg.name,
+        price: pkg.price,
+        limit: pkg.employeeLimit,
+        hrEmail: user.email,
+        hrName: user.name
+      });
+
+      if (res.data.url) {
+        window.location.href = res.data.url;
+      }
+    } catch (error) {
+      console.error("Payment initiation failed", error);
+      alert("Failed to start payment. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="py-20 bg-base-100">
       <div className="container mx-auto px-4 text-center">
@@ -66,8 +100,12 @@ const Packages = () => {
                   ))}
                 </ul>
                 <div className="card-actions">
-                  <button className="btn btn-primary btn-wide">
-                    Choose {pkg.name}
+                  <button
+                    className="btn btn-primary btn-wide"
+                    onClick={() => handlePackageClick(pkg)}
+                    disabled={loading}
+                  >
+                    {loading ? "Processing..." : `Choose ${pkg.name}`}
                   </button>
                 </div>
               </div>

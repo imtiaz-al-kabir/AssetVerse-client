@@ -82,7 +82,7 @@ export default function CheckoutForm({ selectedPackage }) {
                 employeeLimit: selectedPackage.limit,
                 amount: selectedPackage.price,
                 transactionId: paymentIntent.id,
-                status: 'Success'
+                status: 'completed'
             };
 
             try {
