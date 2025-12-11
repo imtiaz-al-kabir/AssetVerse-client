@@ -2,7 +2,7 @@ import React from 'react';
 
 const Testimonials = () => {
     return (
-         <div className="py-20 bg-gray-500 text-neutral-content">
+         <div className="py-20 mb-20 bg-base-200 text-gray-500">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-10">
             Trusted by 100+ Companies
