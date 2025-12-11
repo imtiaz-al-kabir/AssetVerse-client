@@ -1,9 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
 const ImageUpload = ({ label, onUpload, defaultUrl }) => {
     const [imageUrl, setImageUrl] = useState(defaultUrl || "");
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (defaultUrl) setImageUrl(defaultUrl);
+    }, [defaultUrl]);
 
     const handleImageChange = async (e) => {
         const file = e.target.files[0];

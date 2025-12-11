@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import ImageUpload from "../../components/ImageUpload/ImageUpload";
 import useAuth from "../../hooks/useAuth";
 import Swal from "sweetalert2";
 
@@ -92,29 +93,19 @@ const Profile = () => {
             </div>
 
             <div className="form-control w-full mt-2">
-              <label className="label">
-                <span className="label-text">Profile Image URL</span>
-              </label>
-              <input
-                type="text"
-                value={profileImage}
-                onChange={(e) => setProfileImage(e.target.value)}
-                className="input input-bordered w-full focus-within:outline-0"
-                placeholder="https://..."
+              <ImageUpload
+                label="Profile Image"
+                defaultUrl={profileImage}
+                onUpload={(url) => setProfileImage(url)}
               />
             </div>
 
             {user.role === "hr" && (
               <div className="form-control w-full mt-2">
-                <label className="label">
-                  <span className="label-text">Company Logo URL</span>
-                </label>
-                <input
-                  type="text"
-                  value={companyLogo}
-                  onChange={(e) => setCompanyLogo(e.target.value)}
-                  className="input input-bordered w-full focus-within:outline-0"
-                  placeholder="https://..."
+                <ImageUpload
+                  label="Company Logo"
+                  defaultUrl={companyLogo}
+                  onUpload={(url) => setCompanyLogo(url)}
                 />
               </div>
             )}

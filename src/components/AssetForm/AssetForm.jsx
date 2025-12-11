@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import Swal from "sweetalert2";
+import ImageUpload from "../ImageUpload/ImageUpload";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const AssetForm = () => {
@@ -10,6 +11,7 @@ const AssetForm = () => {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm();
 
@@ -59,15 +61,21 @@ const AssetForm = () => {
             </div>
 
             <div className="form-control w-full mt-2">
-              <label className="label">
-                <span className="label-text">Product Image URL</span>
-              </label>
               <input
-                type="text"
-                {...register("productImage", { required: true })}
-                className="input input-bordered w-full focus-within:outline-0"
-                placeholder="https://..."
+                type="hidden"
+                {...register("productImage", {
+                  required: "Product Image is required",
+                })}
               />
+              <ImageUpload
+                label="Product Image"
+                onUpload={(url) =>
+                  setValue("productImage", url, { shouldValidate: true })
+                }
+              />
+              {errors.productImage && (
+                <p className="text-red-500">{errors.productImage.message}</p>
+              )}
             </div>
 
             <div className="form-control w-full mt-2">

@@ -1,4 +1,5 @@
 import { useForm } from "react-hook-form";
+import ImageUpload from "../../../components/ImageUpload/ImageUpload";
 import { useNavigate } from "react-router";
 import useAuth from "../../../hooks/useAuth";
 import Swal from "sweetalert2";
@@ -9,6 +10,7 @@ const RegisterHR = () => {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm();
 
@@ -77,16 +79,13 @@ const RegisterHR = () => {
               )}
             </div>
             <div className="form-control w-full mt-2">
-              <label className="label">
-                <span className="label-text">Company Logo URL</span>
-              </label>
               <input
-                type="text"
-                name="companyLogo"
-                {...register("companyLogo", { required: true })}
-                className="input input-bordered w-full focus-within:outline-0"
-                placeholder="https://..."
-                required
+                type="hidden"
+                {...register("companyLogo", { required: "Company Logo is required" })}
+              />
+              <ImageUpload
+                label="Company Logo"
+                onUpload={(url) => setValue("companyLogo", url, { shouldValidate: true })}
               />
               {errors.companyLogo && (
                 <p className="text-red-500">{errors.companyLogo.message}</p>
