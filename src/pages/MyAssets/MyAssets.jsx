@@ -111,7 +111,7 @@ const MyAssets = () => {
                 <input
                   type="text"
                   placeholder="Search my assets..."
-                  className="input input-bordered focus:outline-none focus:ring-2 focus:ring-success transition-all"
+                  className="input ml-2 input-bordered focus:outline-none focus:ring-2 focus:ring-success transition-all"
                   value={search}
                   onChange={(e) => {
                     setPage(1);
@@ -128,7 +128,7 @@ const MyAssets = () => {
                   </span>
                 </label>
                 <select
-                  className="select select-bordered focus:outline-none focus:ring-2 focus:ring-success transition-all"
+                  className="select ml-2 select-bordered focus:outline-none focus:ring-2 focus:ring-success transition-all"
                   value={filterType}
                   onChange={(e) => {
                     setPage(1);

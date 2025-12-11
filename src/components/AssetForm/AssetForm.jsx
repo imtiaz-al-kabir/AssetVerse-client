@@ -73,10 +73,10 @@ const AssetForm = () => {
           <div className="p-8">
             <form onSubmit={handleSubmit(handleAsset)} className="space-y-6">
               {/* Product Name */}
-              <div className="form-control">
-                <label className="label">
+              <div className="form-control flex flex-col ">
+                <label className="label ">
                   <span className="label-text font-semibold flex items-center gap-2">
-                    <FaBox className="text-primary" />
+                    <FaBox className="text-primary " />
                     Product Name
                   </span>
                 </label>
@@ -84,7 +84,7 @@ const AssetForm = () => {
                   type="text"
                   {...register("productName", { required: "Product name is required" })}
                   className="input input-bordered focus:outline-none focus:ring-2 focus:ring-primary transition-all"
-                  placeholder="e.g., Dell Laptop XPS 15"
+                  placeholder="product name"
                 />
                 {errors.productName && (
                   <p className="text-error text-sm mt-1">{errors.productName.message}</p>

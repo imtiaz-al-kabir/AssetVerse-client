@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { motion } from "motion/react";
 import { FaSearch, FaFilter, FaPlus, FaTrash, FaBox } from "react-icons/fa";
@@ -9,24 +9,28 @@ import useAxiosSecure from "../../hooks/useAxiosSecure";
 const AssetList = () => {
   const [search, setSearch] = useState("");
   const [filterType, setFilterType] = useState("");
+  const [page, setPage] = useState(1);
+  const limit = 10;
 
   const axiosSecure = useAxiosSecure();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
-    queryKey: ["assets", search, filterType],
+    queryKey: ["assets", search, filterType, page],
     queryFn: async () => {
-      let query = "assets?";
+      let query = `assets?page=${page}&limit=${limit}&`;
       if (search) query += `search=${search}&`;
       if (filterType) query += `type=${filterType}&`;
 
       const res = await axiosSecure.get(query);
-      return res.data.assets || [];
+      return res.data;
     },
   });
 
-  const assets = data || [];
+  const assets = data?.assets || [];
+  const total = data?.total || 0;
+  const totalPages = data?.pages || 0;
 
   const deleteMutation = useMutation({
     mutationFn: async (id) => {
@@ -56,6 +60,11 @@ const AssetList = () => {
       }
     });
   };
+
+  // Reset page to 1 when search or filter changes
+  useEffect(() => {
+    setPage(1);
+  }, [search, filterType]);
 
   if (isLoading) {
     return (
@@ -103,7 +112,7 @@ const AssetList = () => {
                 <input
                   type="text"
                   placeholder="Search by name..."
-                  className="input input-bordered focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+                  className="input ml-2 input-bordered focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                 />
@@ -117,7 +126,7 @@ const AssetList = () => {
                   </span>
                 </label>
                 <select
-                  className="select select-bordered focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+                  className="select ml-2 select-bordered focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                   value={filterType}
                   onChange={(e) => setFilterType(e.target.value)}
                 >
@@ -166,8 +175,8 @@ const AssetList = () => {
                       <td>
                         <div
                           className={`badge badge-lg ${asset.productType === "Returnable"
-                              ? "badge-warning"
-                              : "badge-info"
+                            ? "badge-warning"
+                            : "badge-info"
                             }`}
                         >
                           {asset.productType}
@@ -216,6 +225,50 @@ const AssetList = () => {
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-center p-6 border-t border-base-300">
+                <div className="join">
+                  <button
+                    className="join-item btn btn-sm"
+                    disabled={page === 1}
+                    onClick={() => setPage(page - 1)}
+                  >
+                    «
+                  </button>
+                  {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (page <= 3) {
+                      pageNum = i + 1;
+                    } else if (page >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = page - 2 + i;
+                    }
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => setPage(pageNum)}
+                        className={`join-item btn btn-sm ${page === pageNum ? "btn-active btn-primary" : ""
+                          }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                  <button
+                    className="join-item btn btn-sm"
+                    disabled={page === totalPages}
+                    onClick={() => setPage(page + 1)}
+                  >
+                    »
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </motion.div>
       </div>

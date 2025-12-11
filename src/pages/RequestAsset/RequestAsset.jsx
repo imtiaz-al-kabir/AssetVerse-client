@@ -111,8 +111,8 @@ const RequestAsset = () => {
               </label>
               <input
                 type="text"
-                placeholder="Search by name..."
-                className="input input-bordered focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+                placeholder="Search  by name..."
+                className="input ml-2 input-bordered focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -138,7 +138,7 @@ const RequestAsset = () => {
                 >
                   <div className="bg-base-100 rounded-2xl shadow-lg border border-base-300 hover:border-primary/50 transition-all duration-300 overflow-hidden h-full flex flex-col">
                     {/* Image */}
-                    <figure className="relative overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10">
+                    <figure className="relative overflow-hidden bg-linear-to-br from-primary/10 to-accent/10">
                       <img
                         src={asset.productImage || "https://via.placeholder.com/300"}
                         alt={asset.productName}
@@ -209,7 +209,7 @@ const RequestAsset = () => {
 
               {/* Header */}
               <div className="flex items-start gap-4 mb-6">
-                <div className="w-20 h-20 rounded-xl overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10 flex-shrink-0">
+                <div className="w-20 h-20 rounded-xl overflow-hidden bg-linear-to-br from-primary/10 to-accent/10 shrink-0">
                   <img
                     src={selectedAsset?.productImage || "https://via.placeholder.com/80"}
                     alt={selectedAsset?.productName}
@@ -225,11 +225,11 @@ const RequestAsset = () => {
 
               {/* Form */}
               <div className="space-y-4">
-                <div className="form-control">
+                <div className="form-control flex flex-col">
                   <label className="label">
                     <span className="label-text font-semibold">Reason for Request</span>
-                    <span className="label-text-alt text-error">* Required</span>
                   </label>
+                  <br />
                   <textarea
                     className="textarea textarea-bordered h-32 focus:outline-none focus:ring-2 focus:ring-primary transition-all resize-none"
                     placeholder="Please explain why you need this asset..."

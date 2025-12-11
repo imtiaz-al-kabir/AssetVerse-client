@@ -178,8 +178,8 @@ const RegisterHR = () => {
 
               {/* Password */}
               <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold flex items-center gap-2">
+                <label className="label flex py-1">
+                  <span className="label-text font-semibold flex  items-center gap-2">
                     <FaLock className="text-primary" />
                     Password
                   </span>

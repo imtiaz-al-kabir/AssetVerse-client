@@ -8,7 +8,7 @@ const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     const axiosInstance = axios.create({
-        baseURL: 'http://localhost:3000',
+        baseURL: 'https://asseet-vers-server.vercel.app',
         withCredentials: true
     });
 

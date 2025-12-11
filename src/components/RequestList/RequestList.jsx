@@ -6,6 +6,38 @@ import Swal from "sweetalert2";
 import useAuth from "../../hooks/useAuth";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 
+// User Avatar Component with error handling
+const UserAvatar = ({ imageUrl, name }) => {
+  const [imageError, setImageError] = useState(false);
+  const [imageSrc, setImageSrc] = useState(imageUrl);
+
+  useEffect(() => {
+    setImageSrc(imageUrl);
+    setImageError(false);
+  }, [imageUrl]);
+
+  const shouldShowPlaceholder = !imageSrc || imageSrc.trim() === "" || imageError;
+
+  return (
+    <div className="w-10 h-10 rounded-full ring ring-primary ring-offset-2 ring-offset-base-100">
+      {shouldShowPlaceholder ? (
+        <div className="w-full h-full bg-primary text-primary-content flex items-center justify-center">
+          <span className="text-xs font-bold">
+            {(name || "U").charAt(0).toUpperCase()}
+          </span>
+        </div>
+      ) : (
+        <img
+          src={imageSrc}
+          alt={name || "User"}
+          onError={() => setImageError(true)}
+          className="w-full h-full object-cover"
+        />
+      )}
+    </div>
+  );
+};
+
 const RequestList = () => {
   const [requests, setRequests] = useState([]);
   const [total, setTotal] = useState(0);
@@ -138,12 +170,11 @@ const RequestList = () => {
                       </td>
                       <td>
                         <div className="flex items-center gap-3">
-                          <div className="avatar placeholder">
-                            <div className="bg-primary text-primary-content rounded-full w-10">
-                              <span className="text-xs">
-                                {(request.requesterName || "Me").charAt(0).toUpperCase()}
-                              </span>
-                            </div>
+                          <div className="avatar">
+                            <UserAvatar
+                              imageUrl={request.requesterImage}
+                              name={request.requesterName}
+                            />
                           </div>
                           <div>
                             <div className="font-bold">{request.requesterName || "Me"}</div>

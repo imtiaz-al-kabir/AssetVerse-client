@@ -4,6 +4,38 @@ import { FaUsers, FaBuilding, FaEnvelope, FaUserCircle } from "react-icons/fa";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import Loading from "../Loading/Loading";
 
+// User Avatar Component with error handling
+const UserAvatar = ({ imageUrl, name, size = "w-20 h-20" }) => {
+  const [imageError, setImageError] = useState(false);
+  const [imageSrc, setImageSrc] = useState(imageUrl);
+
+  useEffect(() => {
+    setImageSrc(imageUrl);
+    setImageError(false);
+  }, [imageUrl]);
+
+  const shouldShowPlaceholder = !imageSrc || imageSrc.trim() === "" || imageError;
+
+  return (
+    <div className="avatar placeholder mb-3">
+      <div className={`bg-white/20 backdrop-blur-sm text-white rounded-full ${size} ring ring-white ring-offset-2 ring-offset-transparent group-hover:scale-110 transition-transform`}>
+        {shouldShowPlaceholder ? (
+          <span className="text-3xl font-bold">
+            {(name || "U").charAt(0).toUpperCase()}
+          </span>
+        ) : (
+          <img
+            src={imageSrc}
+            alt={name || "User"}
+            onError={() => setImageError(true)}
+            className="w-full h-full object-cover rounded-full"
+          />
+        )}
+      </div>
+    </div>
+  );
+};
+
 const MyTeam = () => {
   const [teamData, setTeamData] = useState([]);
   const [companies, setCompanies] = useState([]);
@@ -155,13 +187,11 @@ const MyTeam = () => {
                   <div className="bg-gradient-to-r from-info to-accent p-6 text-white text-center relative overflow-hidden">
                     <div className="absolute inset-0 bg-white/10 group-hover:bg-white/20 transition-colors"></div>
                     <div className="relative">
-                      <div className="avatar placeholder mb-3">
-                        <div className="bg-white/20 backdrop-blur-sm text-white rounded-full w-20 h-20 ring ring-white ring-offset-2 ring-offset-transparent group-hover:scale-110 transition-transform">
-                          <span className="text-3xl font-bold">
-                            {member.employeeName.charAt(0).toUpperCase()}
-                          </span>
-                        </div>
-                      </div>
+                      <UserAvatar
+                        imageUrl={member.employeeImage}
+                        name={member.employeeName}
+                        size="w-20 h-20"
+                      />
                     </div>
                   </div>
 
