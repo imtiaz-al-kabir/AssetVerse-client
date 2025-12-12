@@ -38,7 +38,7 @@ const Dashboard = () => {
 
   if (loading || !user) {
     return (
-      <Loading/>
+      <Loading />
     );
   }
 
@@ -46,9 +46,8 @@ const Dashboard = () => {
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
       <div
-        className={`flex flex-col bg-secondary text-white transition-all duration-300 ${
-          drawerOpen ? "w-64" : "w-16"
-        }`}
+        className={`flex flex-col bg-secondary text-white transition-all duration-300 ${drawerOpen ? "w-64" : "w-16"
+          }`}
       >
         {/* Logo / toggle */}
         <div className="flex items-center justify-between p-4 border-b border-base-300">
@@ -168,7 +167,97 @@ const Dashboard = () => {
 
           {/* HR or user dashboard */}
           {user.role === "hr" ? (
-            <DashboardCharts />
+            <div className="space-y-8">
+              {/* Company Overview Layout */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Stats Cards */}
+                <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="stats shadow bg-white border border-base-200">
+                    <div className="stat place-items-center">
+                      <div className="stat-title font-medium text-gray-500">
+                        Package
+                      </div>
+                      <div className="stat-value text-primary capitalize text-3xl">
+                        {user.subscription || "Free"}
+                      </div>
+                      <div className="stat-desc text-gray-400 font-medium">
+                        Current Plan
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="stats shadow bg-white border border-base-200">
+                    <div className="stat place-items-center">
+                      <div className="stat-title font-medium text-gray-500">
+                        Employees
+                      </div>
+                      <div className="stat-value text-secondary text-3xl">
+                        {user.currentEmployees || 0}
+                      </div>
+                      <div className="stat-desc text-gray-400 font-medium">
+                        Active Members
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="stats shadow bg-white border border-base-200">
+                    <div className="stat place-items-center">
+                      <div className="stat-title font-medium text-gray-500">
+                        Limit
+                      </div>
+                      <div className="stat-value text-accent text-3xl">
+                        {user.packageLimit || 5}
+                      </div>
+                      <div className="stat-desc text-gray-400 font-medium">
+                        Max Capacity
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick Actions Card */}
+                <div className="card bg-white shadow border border-base-200">
+                  <div className="card-body p-5">
+                    <h3 className="card-title text-base mb-4 flex items-center gap-2">
+                      Quick Actions
+                    </h3>
+                    <div className="grid grid-cols-1 gap-3">
+                      <button
+                        onClick={() => navigate("/assets")}
+                        className="btn btn-outline btn-primary btn-sm w-full gap-2 justify-start normal-case font-medium"
+                      >
+                        <FiBox /> Add & Manage Assets
+                      </button>
+                      <button
+                        onClick={() => navigate("/requests")}
+                        className="btn btn-outline btn-secondary btn-sm w-full gap-2 justify-start normal-case font-medium"
+                      >
+                        <FiClipboard /> View All Requests
+                      </button>
+                      <button
+                        onClick={() => navigate("/subscription")}
+                        className={`btn btn-sm w-full gap-2 justify-start normal-case font-medium ${(user.currentEmployees || 0) >= (user.packageLimit || 5)
+                            ? "btn-error text-white animate-pulse"
+                            : "btn-outline btn-accent"
+                          }`}
+                      >
+                        <FiCreditCard />
+                        {(user.currentEmployees || 0) >= (user.packageLimit || 5)
+                          ? "Limit Reached - Upgrade Now"
+                          : "Upgrade Package"
+                        }
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Analytics Section */}
+              <div>
+                <h3 className="text-xl font-bold mb-4 ml-1">Analytics Overview</h3>
+                <DashboardCharts />
+              </div>
+            </div>
           ) : (
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

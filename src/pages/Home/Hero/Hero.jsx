@@ -1,9 +1,11 @@
 import { motion } from "motion/react";
 import { useNavigate } from "react-router";
 import { FaRocket, FaCheckCircle } from "react-icons/fa";
+import useAuth from "../../../hooks/useAuth";
 
 const Hero = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-primary/10 via-base-100 to-secondary/10 overflow-hidden">
@@ -60,14 +62,16 @@ const Hero = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <button
                 onClick={() => navigate("/register/hr")}
-                className="btn btn-primary btn-lg shadow-lg hover:shadow-xl transition-all duration-300 group"
+                disabled={!!user}
+                className="btn btn-primary btn-lg shadow-lg hover:shadow-xl transition-all duration-300 group disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Start as HR Manager
                 <FaRocket className="ml-2 group-hover:translate-x-1 transition-transform" />
               </button>
               <button
                 onClick={() => navigate("/register/employee")}
-                className="btn btn-outline btn-secondary btn-lg hover:shadow-lg transition-all duration-300"
+                disabled={!!user}
+                className="btn btn-outline btn-secondary btn-lg hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Join as Employee
               </button>
