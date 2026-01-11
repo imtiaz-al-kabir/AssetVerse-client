@@ -25,7 +25,7 @@ const AssetDetails = () => {
     const relatedItems = [
         { id: 101, name: "Mechanical Keyboard", image: "https://images.unsplash.com/photo-1595225476474-87563907a212?w=800", type: "Returnable" },
         { id: 102, name: "Wireless Mouse", image: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=800", type: "Non-returnable" },
-        { id: 103, name: "Monitor Stand", image: "https://images.unsplash.com/photo-1595514020182-4299b158c67c?w=800", type: "Returnable" },
+        { id: 103, name: "Monitor Stand", image: "https://plus.unsplash.com/premium_photo-1706545209829-1b082de60f15?q=80&w=723&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", type: "Returnable" },
     ];
 
     if (isLoading) return <Loading />;
