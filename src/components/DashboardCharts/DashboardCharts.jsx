@@ -41,9 +41,18 @@ const DashboardCharts = () => {
   if (loading) return <Loading />;
 
   // Check if empty
-  if (stats.pieData[0]?.value === 0 && stats.pieData[1]?.value === 0) {
+  // Check if data is missing or empty (Fetch failure or empty state)
+  if (!stats.pieData || stats.pieData.length === 0 || (stats.pieData[0]?.value === 0 && stats.pieData[1]?.value === 0 && stats.barData.length === 0)) {
     return (
-      <div className="text-gray-500 italic">Add assets to see analytics.</div>
+      <div className="grid grid-cols-1 mb-10">
+        <div className="alert shadow-lg bg-base-100 border-base-200">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-info shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <div>
+            <h3 className="font-bold text-base-content">No Analytics Data Yet</h3>
+            <div className="text-xs text-base-content/70">Start managing assets to see your inventory and request statistics here.</div>
+          </div>
+        </div>
+      </div>
     );
   }
 
@@ -51,53 +60,65 @@ const DashboardCharts = () => {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
       {/* Pie Chart */}
       <div className="bg-base-100 p-4 rounded-lg shadow h-[400px]">
-        <h3 className="text-lg font-bold text-center mb-4">
+        <h3 className="text-lg font-bold text-center mb-4 text-base-content">
           Inventory Distribution
         </h3>
-        <ResponsiveContainer width="100%" height="90%">
-          <PieChart>
-            <Pie
-              data={stats.pieData}
-              cx="50%"
-              cy="50%"
-              labelLine={false}
-              label={({ name, percent }) =>
-                `${name} ${(percent * 100).toFixed(0)}%`
-              }
-              outerRadius={80}
-              fill="#8884d8"
-              dataKey="value"
-            >
-              {stats.pieData.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
-                />
-              ))}
-            </Pie>
-            <Tooltip />
-            <Legend />
-          </PieChart>
-        </ResponsiveContainer>
+        {stats.pieData.reduce((acc, curr) => acc + curr.value, 0) > 0 ? (
+          <ResponsiveContainer width="100%" height="90%">
+            <PieChart>
+              <Pie
+                data={stats.pieData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, percent }) =>
+                  `${name} ${(percent * 100).toFixed(0)}%`
+                }
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {stats.pieData.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
+                ))}
+              </Pie>
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#2A303C",
+                  color: "#fff",
+                  borderColor: "#4B5563",
+                }}
+              />
+              <Legend wrapperStyle={{ color: "#A6ADBB" }} />
+            </PieChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex justify-center items-center h-full text-base-content/50">
+            No Assets to Display
+          </div>
+        )}
       </div>
 
       {/* Bar Chart */}
       <div className="bg-base-100 p-4 rounded-lg shadow h-[400px]">
-        <h3 className="text-lg font-bold text-center mb-4">
+        <h3 className="text-lg font-bold text-center mb-4 text-base-content">
           Top 5 Requested Items
         </h3>
         {stats.barData.length > 0 ? (
           <ResponsiveContainer width="100%" height="90%">
             <BarChart data={stats.barData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis allowDecimals={false} />
-              <Tooltip />
+              <CartesianGrid strokeDasharray="3 3" stroke="#4B5563" />
+              <XAxis dataKey="name" stroke="#A6ADBB" />
+              <YAxis allowDecimals={false} stroke="#A6ADBB" />
+              <Tooltip contentStyle={{ backgroundColor: "#2A303C", color: "#fff", borderColor: "#4B5563" }} />
               <Bar dataKey="requests" fill="#82ca9d" name="Requests" />
             </BarChart>
           </ResponsiveContainer>
         ) : (
-          <div className="flex justify-center items-center h-full text-gray-400">
+          <div className="flex justify-center items-center h-full text-base-content/50">
             No requests yet
           </div>
         )}

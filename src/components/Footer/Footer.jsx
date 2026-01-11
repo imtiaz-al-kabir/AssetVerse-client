@@ -71,10 +71,10 @@ const Footer = () => {
             </h4>
             <ul className="space-y-3">
               {[
-                { label: "About Us", to: "/" },
-                { label: "Contact", to: "/" },
-                { label: "Careers", to: "/" },
-                { label: "Blog", to: "/" }
+                { label: "About Us", to: "/about" },
+                { label: "Contact", to: "/contact" },
+                { label: "Careers", to: "/about" },
+                { label: "Blog", to: "/blog" }
               ].map((link, i) => (
                 <li key={i}>
                   <NavLink
@@ -144,15 +144,12 @@ const Footer = () => {
               © {new Date().getFullYear()} AssetVerse. All rights reserved.
             </p>
             <div className="flex gap-6 text-sm">
-              <a href="#" className="text-base-content/60 hover:text-primary transition">
+              <NavLink to="/terms" className="text-base-content/60 hover:text-primary transition">
                 Terms of Service
-              </a>
-              <a href="#" className="text-base-content/60 hover:text-primary transition">
+              </NavLink>
+              <NavLink to="/privacy" className="text-base-content/60 hover:text-primary transition">
                 Privacy Policy
-              </a>
-              <a href="#" className="text-base-content/60 hover:text-primary transition">
-                Cookie Policy
-              </a>
+              </NavLink>
             </div>
           </div>
         </div>

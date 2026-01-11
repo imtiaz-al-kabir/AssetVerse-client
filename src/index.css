@@ -1,4 +1,25 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap");
 @import "tailwindcss";
-@plugin "daisyui" {
-  themes: light --default, dark;
+
+@theme {
+  --font-sans: "Outfit", sans-serif;
+  --color-primary: #4f46e5;
+  /* Indigo 600 */
+  --color-primary-content: #ffffff;
+  --color-secondary: #06b6d4;
+  /* Cyan 500 */
+  --color-secondary-content: #ffffff;
+  --color-accent: #f97316;
+  /* Orange 500 */
+  --color-accent-content: #ffffff;
+  --color-neutral: #1e293b;
+  /* Slate 800 */
+  --color-neutral-content: #ffffff;
+}
+
+@plugin "daisyui";
+
+body {
+  font-family: "Outfit", sans-serif;
+  @apply bg-base-100 text-base-content min-h-screen flex flex-col;
 }

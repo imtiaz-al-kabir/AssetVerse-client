@@ -18,6 +18,12 @@ import Profile from "../pages/Profile/Profile";
 import RequestAsset from "../pages/RequestAsset/RequestAsset";
 import PaymentSuccess from "../pages/Subscription/PaymentSuccess";
 import Subscription from "../pages/Subscription/Subscription";
+import AssetDetails from "../pages/AssetDetails/AssetDetails";
+import AboutPage from "../pages/About/AboutPage";
+import Contact from "../pages/Contact/Contact";
+import Blog from "../pages/Blog/Blog";
+import Privacy from "../pages/Legal/Privacy";
+import Terms from "../pages/Legal/Terms";
 
 const router = createBrowserRouter([
   {
@@ -83,8 +89,32 @@ const router = createBrowserRouter([
         Component: AssetForm,
       },
       {
+        path: "/assets/details/:id",
+        Component: AssetDetails,
+      },
+      {
         path: "/profile",
         Component: Profile,
+      },
+      {
+        path: "/about",
+        Component: AboutPage,
+      },
+      {
+        path: "/contact",
+        Component: Contact,
+      },
+      {
+        path: "/blog",
+        Component: Blog,
+      },
+      {
+        path: "/privacy",
+        Component: Privacy,
+      },
+      {
+        path: "/terms",
+        Component: Terms,
       },
       {
         path: "/subscription",

@@ -17,9 +17,13 @@ import {
 import Loading from "../Loading/Loading";
 
 const Dashboard = () => {
-  const { user, loading, logout } = useAuth();
+  const { user, loading, logout, checkUser } = useAuth();
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(true);
+
+  useEffect(() => {
+    checkUser();
+  }, [checkUser]);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -172,43 +176,43 @@ const Dashboard = () => {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Stats Cards */}
                 <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="stats shadow bg-white border border-base-200">
+                  <div className="stats shadow bg-base-100 border border-base-200">
                     <div className="stat place-items-center">
-                      <div className="stat-title font-medium text-gray-500">
+                      <div className="stat-title font-medium text-base-content/70">
                         Package
                       </div>
                       <div className="stat-value text-primary capitalize text-3xl">
                         {user.subscription || "Free"}
                       </div>
-                      <div className="stat-desc text-gray-400 font-medium">
+                      <div className="stat-desc text-base-content/50 font-medium">
                         Current Plan
                       </div>
                     </div>
                   </div>
 
-                  <div className="stats shadow bg-white border border-base-200">
+                  <div className="stats shadow bg-base-100 border border-base-200">
                     <div className="stat place-items-center">
-                      <div className="stat-title font-medium text-gray-500">
+                      <div className="stat-title font-medium text-base-content/70">
                         Employees
                       </div>
                       <div className="stat-value text-secondary text-3xl">
                         {user.currentEmployees || 0}
                       </div>
-                      <div className="stat-desc text-gray-400 font-medium">
+                      <div className="stat-desc text-base-content/50 font-medium">
                         Active Members
                       </div>
                     </div>
                   </div>
 
-                  <div className="stats shadow bg-white border border-base-200">
+                  <div className="stats shadow bg-base-100 border border-base-200">
                     <div className="stat place-items-center">
-                      <div className="stat-title font-medium text-gray-500">
+                      <div className="stat-title font-medium text-base-content/70">
                         Limit
                       </div>
                       <div className="stat-value text-accent text-3xl">
                         {user.packageLimit || 5}
                       </div>
-                      <div className="stat-desc text-gray-400 font-medium">
+                      <div className="stat-desc text-base-content/50 font-medium">
                         Max Capacity
                       </div>
                     </div>
@@ -216,7 +220,7 @@ const Dashboard = () => {
                 </div>
 
                 {/* Quick Actions Card */}
-                <div className="card bg-white shadow border border-base-200">
+                <div className="card bg-base-100 shadow border border-base-200">
                   <div className="card-body p-5">
                     <h3 className="card-title text-base mb-4 flex items-center gap-2">
                       Quick Actions
@@ -237,8 +241,8 @@ const Dashboard = () => {
                       <button
                         onClick={() => navigate("/subscription")}
                         className={`btn btn-sm w-full gap-2 justify-start normal-case font-medium ${(user.currentEmployees || 0) >= (user.packageLimit || 5)
-                            ? "btn-error text-white animate-pulse"
-                            : "btn-outline btn-accent"
+                          ? "btn-error text-white animate-pulse"
+                          : "btn-outline btn-accent"
                           }`}
                       >
                         <FiCreditCard />

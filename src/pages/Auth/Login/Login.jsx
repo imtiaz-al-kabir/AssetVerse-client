@@ -145,6 +145,7 @@ const Login = () => {
               </button>
             </form>
 
+
             {/* Divider */}
             <div className="divider my-6">OR</div>
 
@@ -169,14 +170,14 @@ const Login = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div >
 
         {/* Bottom decoration */}
-        <div className="text-center mt-6 text-base-content/60 text-sm">
+        < div className="text-center mt-6 text-base-content/60 text-sm" >
           <p>Protected by enterprise-grade security</p>
-        </div>
-      </motion.div>
-    </div>
+        </div >
+      </motion.div >
+    </div >
   );
 };
 
