@@ -1,4 +1,5 @@
 import axios from "axios";
+import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import useAuth from "./useAuth";
 
@@ -11,17 +12,23 @@ const useAxiosSecure = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
-  axiosSecure.interceptors.response.use(
-    (response) => response,
-    async (error) => {
-      const status = error.response ? error.response.status : null;
-      if (status === 401 || status === 403) {
-        await logout();
-        navigate("/login");
+  useEffect(() => {
+    const interceptor = axiosSecure.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        const status = error.response ? error.response.status : null;
+        if (status === 401 || status === 403) {
+          await logout();
+          navigate("/login");
+        }
+        return Promise.reject(error);
       }
-      return Promise.reject(error);
-    }
-  );
+    );
+
+    return () => {
+      axiosSecure.interceptors.response.eject(interceptor);
+    };
+  }, [logout, navigate]);
 
   return axiosSecure;
 };
