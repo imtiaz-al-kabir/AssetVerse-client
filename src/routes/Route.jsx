@@ -1,4 +1,5 @@
 import { createBrowserRouter } from "react-router";
+import PrivateRoute from "./PrivateRoute";
 import AssetForm from "../components/AssetForm/AssetForm";
 import AssetList from "../components/AssetList/AssetList";
 import RequestForm from "../components/RequestForm/RequestForm";
@@ -53,48 +54,92 @@ const router = createBrowserRouter([
       },
       {
         path: "/dashboard",
-        Component: Dashboard,
+        element: (
+          <PrivateRoute>
+            <Dashboard />
+          </PrivateRoute>
+        ),
       },
 
       {
         path: "/my-assets",
-        Component: MyAssets,
+        element: (
+          <PrivateRoute>
+            <MyAssets />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/my-team",
-        Component: MyTeam,
+        element: (
+          <PrivateRoute>
+            <MyTeam />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/request-asset",
-        Component: RequestAsset,
+        element: (
+          <PrivateRoute>
+            <RequestAsset />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/requests",
-        Component: RequestList,
+        element: (
+          <PrivateRoute>
+            <RequestList />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/requests/new",
-        Component: RequestForm,
+        element: (
+          <PrivateRoute>
+            <RequestForm />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/my-employees",
-        Component: MyEmployeeList,
+        element: (
+          <PrivateRoute>
+            <MyEmployeeList />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/assets",
-        Component: AssetList,
+        element: (
+          <PrivateRoute>
+            <AssetList />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/assets/add",
-        Component: AssetForm,
+        element: (
+          <PrivateRoute>
+            <AssetForm />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/assets/details/:id",
-        Component: AssetDetails,
+        element: (
+          <PrivateRoute>
+            <AssetDetails />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/profile",
-        Component: Profile,
+        element: (
+          <PrivateRoute>
+            <Profile />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/about",
@@ -118,11 +163,19 @@ const router = createBrowserRouter([
       },
       {
         path: "/subscription",
-        Component: Subscription,
+        element: (
+          <PrivateRoute>
+            <Subscription />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/payment/success",
-        Component: PaymentSuccess,
+        element: (
+          <PrivateRoute>
+            <PaymentSuccess />
+          </PrivateRoute>
+        ),
       },
     ],
   },

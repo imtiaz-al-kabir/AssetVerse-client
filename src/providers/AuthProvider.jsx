@@ -57,10 +57,10 @@ const AuthProvider = ({ children }) => {
         setLoading(true);
         try {
             await axiosInstance.post("/users/logout");
-            setUser(null);
         } catch (error) {
-            throw error;
+            console.error("Logout failed", error);
         } finally {
+            setUser(null);
             setLoading(false);
         }
     }
